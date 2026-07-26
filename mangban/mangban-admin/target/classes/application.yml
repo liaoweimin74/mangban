@@ -1,0 +1,56 @@
+spring:
+  application:
+    name: mangban
+  datasource:
+    url: jdbc:mysql://localhost:3306/mangban?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    username: root
+    password: 740130
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQLDialect
+  data:
+    redis:
+      host: 127.0.0.1
+      port: 6379
+      database: 0
+      timeout: 10s
+      connect-timeout: 10s
+      jedis:
+        pool:
+          enabled: true
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+  sql:
+    init:
+      mode: always
+      schema-locations: classpath:schema.sql
+      data-locations: classpath:data.sql
+      continue-on-error: true
+
+server:
+  port: 8080
+
+jwt:
+  secret: YnJfRFdpbjQ5dU5hZzJ4c0VvN0s2bUx4R0R4aUZ3cG1WeU9yS3F6RXhDdVN4V0E=
+  access-token-expire: 30
+  refresh-token-expire: 10080
+
+logging:
+  level:
+    com.mangban: debug
+    org.springframework.security: trace
+  file:
+    name: logs/mangban.log
+    max-size: 50MB
+    max-history: 7

@@ -1,0 +1,45 @@
+﻿mvn : WARNING: A restricted method in java.lang.System has been called
+所在位置 行:1 字符: 124
++ ... rk\mangban\mangban-admin"; if ($?) { mvn spring-boot:run 2>&1 | Out-F ...
++                                          ~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (WARNING: A rest...has been called:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+WARNING: java.lang.System::load has been called by org.fusesource.jansi.internal.JansiLoader in an unnamed module (file
+:/D:/application/maven-3.9.0/lib/jansi-2.4.0.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+WARNING: A terminally deprecated method in sun.misc.Unsafe has been called
+WARNING: sun.misc.Unsafe::objectFieldOffset has been called by com.google.common.util.concurrent.AbstractFuture$UnsafeA
+tomicHelper (file:/D:/application/maven-3.9.0/lib/guava-30.1-jre.jar)
+WARNING: Please consider reporting this to the maintainers of class com.google.common.util.concurrent.AbstractFuture$Un
+safeAtomicHelper
+WARNING: sun.misc.Unsafe::objectFieldOffset will be removed in a future release
+WARNING: Final field _cipher in class org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher has been mutat
+ed reflectively by class org.eclipse.sisu.bean.BeanPropertyField in unnamed module @1b083826 (file:/D:/application/mave
+n-3.9.0/lib/org.eclipse.sisu.inject-0.3.5.jar)
+WARNING: Use --enable-final-field-mutation=ALL-UNNAMED to avoid a warning
+WARNING: Mutating final fields will be blocked in a future release unless final field mutation is enabled
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------------< com.mangban:mangban-admin >----------------------
+[INFO] Building mangban-admin 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:3.5.0:run (default-cli) > test-compile @ mangban-admin >>>
+[WARNING] The POM for com.mangban:mangban-system:jar:1.0.0 is missing, no dependency information available
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.870 s
+[INFO] Finished at: 2026-07-26T01:58:24+08:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal on project mangban-admin: Could not resolve dependencies for project com.mangban:mangban-admin:jar:1.0.0: com.mangban:mangban-system:jar:1.0.0 was not found in https://maven.aliyun.com/repository/public during a previous attempt. This failure was cached in the local repository and resolution is not reattempted until the update interval of mirror has elapsed or updates are forced -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/DependencyResolutionException
