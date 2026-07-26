@@ -1,0 +1,17 @@
+- generic [ref=e35]:
+  - complementary [ref=e36]:
+    - generic [ref=e37]: MB
+    - menubar [ref=e39]:
+      - menuitem [ref=e40] [cursor=pointer]
+      - menuitem [ref=e43] [cursor=pointer]
+      - menuitem [ref=e46]
+  - generic [ref=e49]:
+    - generic [ref=e50]:
+      - generic [ref=e51]:
+        - button [active] [ref=e52] [cursor=pointer]
+        - navigation "Breadcrumb" [ref=e55]:
+          - link "首页" [ref=e57]
+      - button "系统管理员" [ref=e59] [cursor=pointer]
+    - generic [ref=e64]: 首页
+    - main [ref=e67]:
+      - heading "欢迎使用盲板管理系统" [level=1] [ref=e69]

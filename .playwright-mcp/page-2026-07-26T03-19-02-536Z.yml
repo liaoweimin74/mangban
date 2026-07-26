@@ -1,0 +1,6 @@
+- generic [ref=e4]:
+  - heading "盲板管理系统" [level=2] [ref=e5]
+  - generic [ref=e6]:
+    - textbox "用户名" [ref=e15]
+    - textbox "密码" [ref=e25]
+    - button "登 录" [ref=e28] [cursor=pointer]

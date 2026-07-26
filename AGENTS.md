@@ -8,8 +8,9 @@
 本项目使用 openspec-superpowers-opencode（`superpowers-bridge-opencode` schema）驱动开发流程，
 所有功能变更遵循 artifact 生命周期管理。
 
-# 语言规范
+# 输出语言
 - 请始终使用中文进行回复。
+- 使用 /init 命令生成的 AGENTS.md 文件也请使用中文。
 
 ## 开发规则
 
@@ -101,6 +102,10 @@ Superpowers 技能（TDD、brainstorming 等）是文件系统上的 `.md` 文�
 - `docs/local/` — 个人本地工作区（`.gitignore` 排除，不纳入版本控制）
   - `inbox/` — 待分析的原始材料、未分类草稿
   - `notes/` — 个人笔记、非正式记录
+
+## 界面规范 (UI Guidelines)
+
+详见 `docs/UI-GUIDELINES.md`
 
 <!-- openspec-superpowers-opencode_instructions -->
 <!-- ⛔ 上方 openspec-superpowers-opencode_instructions 区块为自动生成，禁止修改 ⛔ -->
