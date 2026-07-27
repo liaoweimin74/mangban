@@ -63,7 +63,14 @@
 - **理由**：消除每个 CRUD 页面写弹窗模板 + 表单模板 + CRUD 事件处理的大量重复代码，典型页面从 200+ 行缩至 50 行
 - **替代方案**：外部自行组合 SearchTable + el-dialog + FormBuilder — 灵活但每个页面重复编写弹窗逻辑，违背组件化初衷
 
-### 7. 组件文件结构
+### 7. 操作列按钮折叠：超过 maxVisibleButtons 时收起为"更多"下拉
+
+- **决策**：SearchTable 增加 `maxVisibleButtons` prop（默认 3），操作列中超过该数量的按钮自动折叠到 `el-dropdown` 下拉菜单中，最后显示一个向下的三角图标
+- **理由**：操作列按钮数量不可控（编辑/删除/重置密码/授权/导出等），全部平铺在小列宽内会溢出或换行，折叠方案不依赖 CSS 计算，稳定可靠
+- **行为**：前 N 个按钮直接显示，剩余按钮放在 el-dropdown 中，点击下拉展开；不改变按钮的 onClick、confirm 等行为逻辑
+- **替代方案**：CSS 自动溢出隐藏 — 兼容性差，无法处理 el-popconfirm 的交互
+
+### 8. 组件文件结构
 
 ```
 src/components/business/
@@ -152,6 +159,25 @@ const formFields: FormField[] = [
 - 操作列"编辑"按钮 → 调用 getApi 获取详情 → 填充表单弹窗
 - 操作列"删除"按钮 → 确认弹窗 → 调用 deleteApi → 刷新列表
 - 表单提交 → 调用 createApi / updateApi → 关闭弹窗 → 刷新列表
+
+操作列按钮较多时自动折叠（默认最多显示 3 个，超出部分收起在"更多"下拉中）：
+
+```vue
+<SearchTable
+  :search-fields="searchFields"
+  :columns="columns"
+  :fetch-api="(p) => getUserList(p).then(r => r.data)"
+  :form-config="formConfig"
+  :action-buttons="[
+    { label: '编辑', type: 'primary', onClick: (r) => handleEdit(r) },
+    { label: '重置密码', type: 'warning', onClick: (r) => handleResetPwd(r) },
+    { label: '分配角色', onClick: (r) => handleAssignRole(r) },
+    { label: '删除', type: 'danger', confirm: '确定删除？', onClick: (r) => handleDelete(r) },
+  ]"
+  :max-visible-buttons="2"
+/>
+<!-- 结果：编辑、重置密码 直接显示，分配角色、删除 折叠到"更多▼"下拉中 -->
+```
 
 ### SearchTable — 纯列表（独立使用）
 

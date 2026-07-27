@@ -10,6 +10,7 @@
 - [ ] 2.2 实现搜索/重置/导出三个按钮，靠右对齐，分别触发查询、重置、导出事件
 - [ ] 2.3 实现表格渲染（根据 columns 配置渲染列，支持 formatter 和自定义 slot）
 - [ ] 2.4 实现操作列：formConfig 存在时默认生成"编辑"/"删除"按钮，actionButtons 显式传入时覆盖默认
+- [ ] 2.5 实现操作列按钮折叠：maxVisibleButtons 控制直接显示的按钮数，超出部分折叠到"更多"下拉菜单
 - [ ] 2.5 实现分页导航（el-pagination，绑定 total/page/size，响应 size-change 和 current-change）
 - [ ] 2.6 实现数据获取逻辑（onMounted 自动调用 fetchApi，search/reset/pagination 变化时重新请求）
 - [ ] 2.7 实现 loading 状态和 toolbar slot

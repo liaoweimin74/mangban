@@ -94,6 +94,7 @@ export interface SearchTableProps<T = any> {
   pageSizes?: number[]
   showExport?: boolean
   exportLoading?: boolean
+  maxVisibleButtons?: number // 操作列最多直接显示的按钮数，超出部分折叠到"更多"下拉
   // 集成 FormBuilder 的 CRUD 配置
   formConfig?: FormConfig<T>
 }
@@ -199,7 +200,8 @@ const props = withDefaults(defineProps<SearchTableProps>(), {
   defaultPageSize: 10,
   pageSizes: () => [10, 20, 50],
   showExport: false,
-  exportLoading: false
+  exportLoading: false,
+  maxVisibleButtons: 3
 })
 
 const emit = defineEmits<{
@@ -247,6 +249,15 @@ function getDefaultActions(): ActionButton[] {
     })
   }
   return btns
+}
+
+// 分割可见按钮和折叠按钮
+const visibleButtons = computed(() => resolvedActionButtons.value.slice(0, props.maxVisibleButtons))
+const dropdownButtons = computed(() => resolvedActionButtons.value.slice(props.maxVisibleButtons))
+
+function handleDropdownAction(row: any, command: string) {
+  const btn = resolvedActionButtons.value.find(b => b.label === command)
+  if (btn) btn.onClick(row)
 }
 // ... 后续逻辑
 </script>
@@ -299,8 +310,8 @@ function getDefaultActions(): ActionButton[] {
     <!-- 操作列 -->
     <el-table-column v-if="resolvedActionButtons.length" label="操作" :width="actionColumnWidth" fixed="right">
       <template #default="{ row }">
-        <div class="flex items-center gap-1 whitespace-nowrap">
-          <template v-for="btn in resolvedActionButtons" :key="btn.label">
+        <div class="flex items-center gap-1 whitespace-nowrap" style="display: inline-flex; align-items: center;">
+          <template v-for="btn in visibleButtons" :key="btn.label">
             <el-popconfirm v-if="btn.confirm" :title="btn.confirm" @confirm="btn.onClick(row)">
               <template #reference>
                 <el-button size="small" :type="btn.type || 'text'" v-permission="btn.permission">{{ btn.label }}</el-button>
@@ -308,6 +319,31 @@ function getDefaultActions(): ActionButton[] {
             </el-popconfirm>
             <el-button v-else size="small" :type="btn.type || 'text'" v-permission="btn.permission" @click="btn.onClick(row)">{{ btn.label }}</el-button>
           </template>
+          <!-- 折叠按钮 -->
+          <el-dropdown v-if="dropdownButtons.length" trigger="click" @command="(cmd) => handleDropdownAction(row, cmd)">
+            <el-button size="small" text>
+              <div style="display: flex; align-items: center; gap: 2px">
+                <span>更多</span>
+                <el-icon><ArrowDown /></el-icon>
+              </div>
+            </el-button>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <template v-for="btn in dropdownButtons" :key="btn.label">
+                  <el-dropdown-item v-if="btn.confirm" :command="btn.label" divided>
+                    <el-popconfirm :title="btn.confirm" @confirm="btn.onClick(row)">
+                      <template #reference>
+                        <span>{{ btn.label }}</span>
+                      </template>
+                    </el-popconfirm>
+                  </el-dropdown-item>
+                  <el-dropdown-item v-else :command="btn.label" @click="btn.onClick(row)">
+                    {{ btn.label }}
+                  </el-dropdown-item>
+                </template>
+              </el-dropdown-menu>
+            </template>
+          </el-dropdown>
         </div>
       </template>
     </el-table-column>

@@ -152,3 +152,23 @@ SearchTable SHALL accept a `formConfig` prop. When present, SearchTable SHALL re
 - **GIVEN** a SearchTable without `formConfig` and without `actionButtons`
 - **WHEN** the component renders
 - **THEN** no action column SHALL be rendered
+
+---
+
+### Requirement: SearchTable SHALL fold excess action buttons into a "更多" dropdown when exceeding maxVisibleButtons
+SearchTable SHALL accept a `maxVisibleButtons` prop (default 3). The first N buttons SHALL be displayed directly in the action column. Remaining buttons SHALL be hidden inside an el-dropdown triggered by a "更多" button with a down arrow icon.
+
+#### Scenario: Buttons within limit display directly
+- **GIVEN** a SearchTable with `maxVisibleButtons: 3` and 3 action buttons
+- **WHEN** the table renders
+- **THEN** all 3 buttons SHALL be displayed directly in the action column, no dropdown
+
+#### Scenario: Buttons exceeding limit fold into dropdown
+- **GIVEN** a SearchTable with `maxVisibleButtons: 2` and 4 action buttons
+- **WHEN** the table renders
+- **THEN** the first 2 buttons SHALL be displayed directly, and a "更多" button with a down arrow SHALL appear, clicking it SHALL reveal the remaining 2 buttons in a dropdown menu
+
+#### Scenario: Dropdown button click triggers the correct action
+- **GIVEN** a SearchTable with a folded action button labeled "重置密码" with an onClick handler
+- **WHEN** the user clicks "重置密码" in the dropdown menu
+- **THEN** the onClick handler SHALL be called with the correct row data
