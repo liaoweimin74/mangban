@@ -1,9 +1,9 @@
 // ----- TDD CYCLE 1: RED — FormBuilder 字段渲染 -----
 // npx vitest run src/components/business/__tests__/FormBuilder.test.ts
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect } from 'vitest'
 import { mount } from '@vue/test-utils'
-import { nextTick, ref } from 'vue'
+import { nextTick } from 'vue'
 import ElementPlus from 'element-plus'
 import FormBuilder from '../FormBuilder.vue'
 import type { FormField } from '../types'

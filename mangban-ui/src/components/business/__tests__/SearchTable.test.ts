@@ -1,7 +1,7 @@
 // ----- TDD: SearchTable 组件测试 -----
 // npx vitest run src/components/business/__tests__/SearchTable.test.ts
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import ElementPlus from 'element-plus'
@@ -62,7 +62,7 @@ describe('SearchTable — 搜索栏渲染', () => {
   })
 
   it('渲染搜索和重置按钮', () => {
-    const wrapper = createWrapper()
+    const wrapper = createWrapper({})
     expect(wrapper.text()).toContain('搜索')
     expect(wrapper.text()).toContain('重置')
   })

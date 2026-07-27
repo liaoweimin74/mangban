@@ -1,7 +1,7 @@
 // ----- TDD: ReferencePicker 组件测试 -----
 // npx vitest run src/components/business/__tests__/ReferencePicker.test.ts
 
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
 import ElementPlus from 'element-plus'
