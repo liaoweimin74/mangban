@@ -1,34 +1,132 @@
-## ADDED Requirements
+## 新增需求
 
-### Requirement: FormBuilder SHALL render form fields based on field definitions
-FormBuilder SHALL accept a `fields` prop defining each form field's type, label, prop name, placeholder, validation rules, and options. Each field type SHALL render the corresponding Element Plus form control.
+### 需求：FormBuilder 应根据字段定义渲染表单控件
+FormBuilder 应接受 `fields` prop 定义每个表单字段的类型、标签、字段名、占位符、验证规则和选项。每个字段类型渲染对应的 Element Plus 表单控件。
 
-#### Scenario: Render input field
-- **GIVEN** a FormBuilder with fields containing `{ type: 'input', label: '用户名', prop: 'username', placeholder: '请输入用户名' }`
-- **WHEN** the component renders
-- **THEN** an el-form-item with label "用户名" and el-input with placeholder "请输入用户名" SHALL be rendered
+#### 场景：渲染输入框
+- **给定** FormBuilder 的 fields 包含 `{ type: 'input', label: '用户名', prop: 'username', placeholder: '请输入用户名' }`
+- **当** 组件渲染时
+- **那么** 应渲染一个 el-form-item（标签"用户名"）和一个 el-input（占位符"请输入用户名"）
 
-#### Scenario: Render select field with options
-- **GIVEN** a FormBuilder with fields containing `{ type: 'select', label: '角色', prop: 'roleIds', options: [{ label: '管理员', value: 1 }, { label: '普通用户', value: 2 }] }`
-- **WHEN** the component renders
-- **THEN** an el-select with the given options SHALL be rendered
+#### 场景：渲染带选项的下拉选择框
+- **给定** FormBuilder 的 fields 包含 `{ type: 'select', label: '角色', prop: 'roleIds', options: [{ label: '管理员', value: 1 }, { label: '普通用户', value: 2 }] }`
+- **当** 组件渲染时
+- **那么** 应渲染一个 el-select 并包含给出的选项
 
-#### Scenario: Render tree-select field
-- **GIVEN** a FormBuilder with fields containing `{ type: 'tree-select', label: '组织机构', prop: 'orgId', treeProps: { data: [], props: { label: 'label', value: 'id', children: 'children' } } }`
-- **WHEN** the component renders
-- **THEN** an el-tree-select with the given treeProps SHALL be rendered
+#### 场景：渲染树形选择框
+- **给定** FormBuilder 的 fields 包含 `{ type: 'tree-select', label: '组织机构', prop: 'orgId', treeProps: { data: [], props: { label: 'label', value: 'id', children: 'children' } } }`
+- **当** 组件渲染时
+- **那么** 应渲染一个 el-tree-select 并包含给出的 treeProps
 
-#### Scenario: Render switch field
-- **GIVEN** a FormBuilder with fields containing `{ type: 'switch', label: '状态', prop: 'status' }`
-- **WHEN** the component renders
-- **THEN** an el-switch SHALL be rendered
+#### 场景：渲染开关
+- **给定** FormBuilder 的 fields 包含 `{ type: 'switch', label: '状态', prop: 'status' }`
+- **当** 组件渲染时
+- **那么** 应渲染一个 el-switch
 
-#### Scenario: Render date-picker field
-- **GIVEN** a FormBuilder with fields containing `{ type: 'date-picker', label: '创建时间', prop: 'createdAt' }`
-- **WHEN** the component renders
-- **THEN** an el-date-picker SHALL be rendered
+#### 场景：渲染日期选择器
+- **给定** FormBuilder 的 fields 包含 `{ type: 'date-picker', label: '创建时间', prop: 'createdAt' }`
+- **当** 组件渲染时
+- **那么** 应渲染一个 el-date-picker
 
-#### Scenario: Render slot field for custom content
+#### 场景：渲染文本域
+- **给定** FormBuilder 的 fields 包含 `{ type: 'textarea', label: '备注', prop: 'remark', placeholder: '请输入备注' }`
+- **当** 组件渲染时
+- **那么** 应渲染一个 el-input type="textarea"
+
+#### 场景：渲染单选按钮组
+- **给定** FormBuilder 的 fields 包含 `{ type: 'radio', label: '性别', prop: 'gender', options: [{ label: '男', value: 1 }, { label: '女', value: 2 }] }`
+- **当** 组件渲染时
+- **那么** 应渲染一个 el-radio-group
+
+#### 场景：渲染多选框组
+- **给定** FormBuilder 的 fields 包含 `{ type: 'checkbox', label: '爱好', prop: 'hobbies', options: [{ label: '阅读', value: 'reading' }, { label: '运动', value: 'sports' }] }`
+- **当** 组件渲染时
+- **那么** 应渲染一个 el-checkbox-group
+
+#### 场景：使用自定义插槽渲染字段
+- **给定** FormBuilder 的 fields 包含 `{ type: 'slot', label: '自定义', prop: 'custom', slotName: 'customField' }`
+- **当** 父组件提供 `<template #customField="{ value, update }">` 内容时
+- **那么** 该字段应渲染插槽内容
+
+---
+
+### 需求：FormBuilder 应支持 v-model 双向绑定
+FormBuilder 通过 `modelValue` prop 和 `update:modelValue` emit 实现 v-model 双向绑定。字段值变化时自动更新绑定数据。
+
+#### 场景：输入框值变化触发更新
+- **给定** FormBuilder 的 `modelValue` 为 `{ username: '' }`，字段为 input 类型
+- **当** 用户输入"admin"时
+- **那么** 组件应 emit 'update:modelValue'，新值为 `{ username: 'admin' }`
+
+#### 场景：初始值正确显示
+- **给定** FormBuilder 的 `modelValue` 为 `{ username: 'admin', status: 1 }`
+- **当** 组件渲染时
+- **那么** 输入框应显示"admin"，开关应处于打开状态
+
+---
+
+### 需求：FormBuilder 应支持布局配置
+FormBuilder 应通过 `layout` prop 支持三种布局模式：single（单列）、double（双列）、grid（栅格，指定列数）。
+
+#### 场景：单列布局
+- **给定** FormBuilder 的 `layout="single"`，有 4 个字段
+- **当** 组件渲染时
+- **那么** 每个字段应独占一行，单列显示
+
+#### 场景：双列布局
+- **给定** FormBuilder 的 `layout="double"`，有 4 个字段
+- **当** 组件渲染时
+- **那么** 字段应分 2 列显示，共 2 行
+
+---
+
+### 需求：FormBuilder 应支持表单验证
+FormBuilder 应集成 Element Plus 表单验证。带有 `rules` prop 的字段在提交时会被验证。
+
+#### 场景：必填字段验证
+- **给定** FormBuilder 的字段为 `{ type: 'input', label: '用户名', prop: 'username', rules: [{ required: true, message: '请输入用户名' }] }`
+- **当** 表单在用户名为空时提交
+- **那么** 验证应失败，提示消息"请输入用户名"
+
+---
+
+### 需求：FormBuilder 应通过 ref 暴露 validate 和 resetFields 方法
+FormBuilder 应暴露 `validate()`、`validateField(prop)`、`resetFields()`、`clearValidate()` 方法，父组件通过模板 ref 调用。
+
+#### 场景：验证所有字段
+- **给定** 父组件通过模板 ref `formRef` 引用 FormBuilder
+- **当** 父组件调用 `formRef.validate()` 时
+- **那么** 所有字段应被验证，返回 Promise<boolean>
+
+#### 场景：重置所有字段
+- **给定** FormBuilder 的表单数据已填写
+- **当** 父组件调用 `formRef.resetFields()` 时
+- **那么** 所有字段应重置为初始值
+
+---
+
+### 需求：FormBuilder 应支持字段 onChange 回调，在值变更时拦截或接受
+每个 FormField 应接受可选的 `onChange` 函数 `(newVal: any, oldVal: any, formData: Record<string, any>) => boolean | Promise<boolean>`。当回调返回 `false` 或 Promise 解析为 `false` 时，字段值应回退到旧值。否则正常更新。
+
+#### 场景：onChange 返回 false，拒绝变更
+- **给定** FormBuilder 的字段为 `{ type: 'input', label: '编码', prop: 'code', onChange: (newVal) => newVal.length <= 10 }`
+- **当** 用户输入超过 10 个字符时
+- **那么** 字段值不应更新，保持旧值
+
+#### 场景：onChange 返回 true，接受变更
+- **给定** FormBuilder 的字段为 `{ type: 'input', label: '编码', prop: 'code', onChange: (newVal) => newVal.length <= 10 }`
+- **当** 用户输入 5 个字符时
+- **那么** 字段值应更新为新值
+
+#### 场景：onChange 返回 Promise<false>，异步拒绝
+- **给定** FormBuilder 的字段为 `{ type: 'select', label: '组织', prop: 'orgId', onChange: async (newVal) => { const res = await checkOrg(newVal); return res.valid } }`
+- **当** 用户选择一个组织，异步校验返回 `{ valid: false }` 时
+- **那么** 字段值不应更新
+
+#### 场景：onChange 接收 oldVal 和 formData 上下文
+- **给定** FormBuilder 的字段为 `[{ prop: 'type', ... }, { prop: 'category', onChange: (newVal, oldVal, formData) => formData.type === 'A' }]`
+- **当** 用户在 type 为 'A' 时修改 category
+- **那么** onChange 应通过 formData 接收到 type 的当前值ender slot field for custom content
 - **GIVEN** a FormBuilder with fields containing `{ type: 'slot', label: '自定义', prop: 'custom', slotName: 'customField' }`
 - **WHEN** the parent provides `<template #customField><div>自定义内容</div></template>`
 - **THEN** the slot content SHALL be rendered in place of the form control

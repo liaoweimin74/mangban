@@ -1,174 +1,174 @@
-## ADDED Requirements
+## 新增需求
 
-### Requirement: SearchTable SHALL render a filter/search bar at the top
-SearchTable SHALL render a filter/search bar at the top based on the `searchFields` prop definition. Each field type SHALL render the corresponding Element Plus form control.
+### 需求：SearchTable 应在顶部渲染查询筛选栏
+SearchTable 根据 `searchFields` prop 定义在顶部渲染查询筛选栏，每个字段类型渲染对应的 Element Plus 表单控件。
 
-#### Scenario: Render text input field
-- **GIVEN** a SearchTable with `searchFields` containing `{ type: 'input', label: '用户名', prop: 'username' }`
-- **WHEN** the component mounts
-- **THEN** the search bar SHALL display an el-form-item with label "用户名" and an el-input bound to query.username
+#### 场景：渲染文本输入框
+- **给定** SearchTable 的 `searchFields` 包含 `{ type: 'input', label: '用户名', prop: 'username' }`
+- **当** 组件挂载时
+- **那么** 查询栏应显示一个 el-form-item（标签"用户名"）和一个 el-input（绑定到 query.username）
 
-#### Scenario: Render select field
-- **GIVEN** a SearchTable with `searchFields` containing `{ type: 'select', label: '状态', prop: 'status', options: [{ label: '启用', value: 1 }, { label: '停用', value: 0 }] }`
-- **WHEN** the component mounts
-- **THEN** the search bar SHALL display an el-select with the given options
+#### 场景：渲染下拉选择框
+- **给定** SearchTable 的 `searchFields` 包含 `{ type: 'select', label: '状态', prop: 'status', options: [{ label: '启用', value: 1 }, { label: '停用', value: 0 }] }`
+- **当** 组件挂载时
+- **那么** 查询栏应显示一个 el-select 并包含给出的选项
 
-#### Scenario: Render tree-select field
-- **GIVEN** a SearchTable with `searchFields` containing `{ type: 'tree-select', label: '组织机构', prop: 'orgId', treeProps: { data: [], props: { label: 'label', value: 'id' } } }`
-- **WHEN** the component mounts
-- **THEN** the search bar SHALL display an el-tree-select with the given treeProps
-
----
-
-### Requirement: SearchTable SHALL provide search, reset, and export buttons on the right side of the filter bar
-SearchTable SHALL render search (el-button type=primary with icon Search), reset (el-button with icon Refresh), and export (el-button with icon Download) buttons aligned to the right side of the filter bar.
-
-#### Scenario: Search button triggers query
-- **GIVEN** a SearchTable with a fetchApi prop
-- **WHEN** the user clicks the search button
-- **THEN** SearchTable SHALL set page to 1 and call fetchApi with the current query params
-
-#### Scenario: Reset button clears filters and re-queries
-- **GIVEN** a SearchTable with filled search fields
-- **WHEN** the user clicks the reset button
-- **THEN** SearchTable SHALL clear all query field values, set page to 1, and call fetchApi
-
-#### Scenario: Export button emits export event
-- **GIVEN** a SearchTable
-- **WHEN** the user clicks the export button
-- **THEN** SearchTable SHALL emit an 'export' event with the current query params
+#### 场景：渲染树形选择框
+- **给定** SearchTable 的 `searchFields` 包含 `{ type: 'tree-select', label: '组织机构', prop: 'orgId', treeProps: { data: [], props: { label: 'label', value: 'id' } } }`
+- **当** 组件挂载时
+- **那么** 查询栏应显示一个 el-tree-select 并包含给出的 treeProps
 
 ---
 
-### Requirement: SearchTable SHALL render a data table in the middle area
-SearchTable SHALL render an el-table with columns defined by the `columns` prop. Each column SHALL support prop binding, custom label, width, formatter function, and custom template via slot.
+### 需求：SearchTable 应在筛选栏右侧提供搜索、重置、导出按钮
+SearchTable 应渲染搜索按钮（el-button type=primary，图标 Search）、重置按钮（el-button，图标 Refresh）、导出按钮（el-button，图标 Download），靠右对齐。
 
-#### Scenario: Render simple text columns
-- **GIVEN** a SearchTable with `columns` containing `[{ prop: 'username', label: '用户名', width: 120 }, { prop: 'email', label: '邮箱', minWidth: 160 }]`
-- **WHEN** the table renders with data
-- **THEN** each row SHALL display the corresponding prop value in the column
+#### 场景：搜索按钮触发查询
+- **给定** SearchTable 有 fetchApi prop
+- **当** 用户点击搜索按钮时
+- **那么** SearchTable 应将 page 设为 1，并使用当前查询参数调用 fetchApi
 
-#### Scenario: Render action column with buttons
-- **GIVEN** a SearchTable with `actionButtons` containing `[{ label: '编辑', type: 'primary', permission: 'system:user:edit', onClick: (row) => handleEdit(row) }]`
-- **WHEN** the table renders
-- **THEN** the last column SHALL contain action buttons per row
+#### 场景：重置按钮清空筛选条件并重新查询
+- **给定** SearchTable 的查询字段已填入内容
+- **当** 用户点击重置按钮时
+- **那么** SearchTable 应清空所有查询字段值，将 page 设为 1，并调用 fetchApi
 
-#### Scenario: Custom column template via slot
-- **GIVEN** a SearchTable with a column that has `slotName: 'status'`
-- **WHEN** the parent provides `<template #status="{ row }">` content
-- **THEN** the column SHALL render the slot content instead of the raw prop value
-
----
-
-### Requirement: SearchTable SHALL render pagination at the bottom
-SearchTable SHALL render el-pagination at the bottom, showing total count, page size selector (10/20/50), prev/next buttons, and page number buttons.
-
-#### Scenario: Pagination triggers re-fetch on change
-- **GIVEN** a SearchTable with fetchApi returning total=100
-- **WHEN** the user clicks page 2
-- **THEN** SearchTable SHALL set page to 2 and call fetchApi with the updated page param
-
-#### Scenario: Page size change triggers re-fetch
-- **GIVEN** a SearchTable with default pageSize=10
-- **WHEN** the user selects 20 from page size dropdown
-- **THEN** SearchTable SHALL set size to 20, set page to 1, and call fetchApi
+#### 场景：导出按钮触发导出事件
+- **给定** SearchTable 的 showExport 为 true
+- **当** 用户点击导出按钮时
+- **那么** SearchTable 应 emit 一个 'export' 事件，携带当前查询参数
 
 ---
 
-### Requirement: SearchTable SHALL support loading state
-SearchTable SHALL show el-table v-loading during fetchApi execution.
+### 需求：SearchTable 应在中间区域渲染数据表格
+SearchTable 根据 `columns` prop 定义渲染 el-table。每列支持 prop 绑定、自定义标签、宽度、格式化函数和自定义模板插槽。
 
-#### Scenario: Loading indicator shown during fetch
-- **GIVEN** a SearchTable with fetchApi that takes 500ms to resolve
-- **WHEN** the component is fetching data
-- **THEN** the table SHALL display a loading overlay
+#### 场景：渲染简单文本列
+- **给定** SearchTable 的 `columns` 包含 `[{ prop: 'username', label: '用户名', width: 120 }, { prop: 'email', label: '邮箱', minWidth: 160 }]`
+- **当** 表格渲染数据时
+- **那么** 每行应在对应列显示该 prop 的值
 
----
+#### 场景：渲染操作列按钮
+- **给定** SearchTable 的 `actionButtons` 包含 `[{ label: '编辑', type: 'primary', permission: 'system:user:edit', onClick: (row) => handleEdit(row) }]`
+- **当** 表格渲染时
+- **那么** 最后一列应为操作列，每行包含操作按钮
 
-### Requirement: SearchTable SHALL support toolbar slot above the table
-SearchTable SHALL provide a default slot between the filter bar and the table for toolbar buttons (e.g. "新增用户").
-
-#### Scenario: Toolbar slot renders custom content
-- **GIVEN** a SearchTable with `<template #default><el-button>新增用户</el-button></template>`
-- **WHEN** the component renders
-- **THEN** the toolbar area SHALL contain the "新增用户" button
-
----
-
-### Requirement: SearchTable SHALL accept fetchApi as a required function prop
-SearchTable SHALL require a `fetchApi` prop that is a function `(params: QueryParams) => Promise<{ rows: T[]; total: number }>`. The component SHALL call it automatically on mount and on search/reset/pagination change.
-
-#### Scenario: Auto-fetch on mount
-- **GIVEN** a SearchTable with a valid fetchApi
-- **WHEN** the component mounts
-- **THEN** fetchApi SHALL be called with default params (page=1, size=10)
-
-#### Scenario: fetchApi receives correct params
-- **GIVEN** a SearchTable with search fields and fetchApi
-- **WHEN** the user fills username and clicks search
-- **THEN** fetchApi SHALL be called with `{ page: 1, size: 10, username: 'admin' }`
+#### 场景：通过插槽自定义列模板
+- **给定** SearchTable 的列配置中某列有 `slotName: 'status'`
+- **当** 父组件提供 `<template #status="{ row }">` 内容时
+- **那么** 该列应渲染插槽内容而非原始 prop 值
 
 ---
 
-### Requirement: SearchTable SHALL support formConfig prop for integrated CRUD with FormBuilder
-SearchTable SHALL accept a `formConfig` prop. When present, SearchTable SHALL render a "新增" button in the toolbar, and "编辑"/"删除" buttons in the action column. The component SHALL manage the dialog open/close state, form data binding, and CRUD API calls internally.
+### 需求：SearchTable 应在底部渲染分页导航
+SearchTable 应渲染 el-pagination，显示总条数、每页条数选择器（10/20/50）、上一页/下一页按钮和页码按钮。
 
-#### Scenario: formConfig renders default action buttons
-- **GIVEN** a SearchTable with `formConfig` containing `{ fields: [...], createApi, updateApi, deleteApi }`
-- **WHEN** the component renders
-- **THEN** the toolbar SHALL contain a "新增用户" button and each row SHALL have "编辑" and "删除" buttons
+#### 场景：切换页码触发重新查询
+- **给定** SearchTable 的 fetchApi 返回 total=100
+- **当** 用户点击第 2 页时
+- **那么** SearchTable 应将 page 设为 2，并使用更新后的 page 参数调用 fetchApi
 
-#### Scenario: New button opens empty form dialog
-- **GIVEN** a SearchTable with formConfig
-- **WHEN** the user clicks "新增用户"
-- **THEN** a dialog SHALL open with title "新增" and an empty FormBuilder
-
-#### Scenario: Edit button fetches detail and opens form dialog
-- **GIVEN** a SearchTable with formConfig containing `getApi: (id) => fetchUser(id)`
-- **WHEN** the user clicks "编辑" on a row
-- **THEN** getApi SHALL be called with the row's id, and then a dialog SHALL open with the fetched data filled in the FormBuilder
-
-#### Scenario: Delete button shows confirm and calls deleteApi
-- **GIVEN** a SearchTable with formConfig containing `deleteApi: (id) => deleteUser(id)`
-- **WHEN** the user clicks "删除" on a row and confirms
-- **THEN** deleteApi SHALL be called with the row's id, and the list SHALL be refreshed
-
-#### Scenario: Form submit creates or updates
-- **GIVEN** a SearchTable with formConfig containing `createApi` and `updateApi`
-- **WHEN** the user fills the form and clicks "确定" in the dialog
-- **THEN** createApi SHALL be called with form data (for new) or updateApi SHALL be called with id and form data (for edit), then the dialog SHALL close and the list SHALL refresh
-
-#### Scenario: actionButtons overrides default formConfig buttons
-- **GIVEN** a SearchTable with both `formConfig` and `actionButtons`
-- **WHEN** the component renders
-- **THEN** the action column SHALL render `actionButtons` instead of the default "编辑"/"删除" buttons
-
-#### Scenario: empty actionButtons hides action column
-- **GIVEN** a SearchTable with `formConfig` and `actionButtons: []`
-- **WHEN** the component renders
-- **THEN** no action column SHALL be rendered
-
-#### Scenario: formConfig without formConfig renders no default action buttons
-- **GIVEN** a SearchTable without `formConfig` and without `actionButtons`
-- **WHEN** the component renders
-- **THEN** no action column SHALL be rendered
+#### 场景：切换每页条数触发重新查询
+- **给定** SearchTable 的默认 pageSize=10
+- **当** 用户从每页条数下拉框选择 20 时
+- **那么** SearchTable 应将 size 设为 20，page 设为 1，并调用 fetchApi
 
 ---
 
-### Requirement: SearchTable SHALL fold excess action buttons into a "更多" dropdown when exceeding maxVisibleButtons
-SearchTable SHALL accept a `maxVisibleButtons` prop (default 3). The first N buttons SHALL be displayed directly in the action column. Remaining buttons SHALL be hidden inside an el-dropdown triggered by a "更多" button with a down arrow icon.
+### 需求：SearchTable 应支持加载状态
+SearchTable 在 fetchApi 执行期间应显示 el-table 的 v-loading 加载遮罩。
 
-#### Scenario: Buttons within limit display directly
-- **GIVEN** a SearchTable with `maxVisibleButtons: 3` and 3 action buttons
-- **WHEN** the table renders
-- **THEN** all 3 buttons SHALL be displayed directly in the action column, no dropdown
+#### 场景：加载中显示遮罩
+- **给定** SearchTable 的 fetchApi 需要 500ms 才能完成
+- **当** 组件正在请求数据时
+- **那么** 表格应显示加载遮罩
 
-#### Scenario: Buttons exceeding limit fold into dropdown
-- **GIVEN** a SearchTable with `maxVisibleButtons: 2` and 4 action buttons
-- **WHEN** the table renders
-- **THEN** the first 2 buttons SHALL be displayed directly, and a "更多" button with a down arrow SHALL appear, clicking it SHALL reveal the remaining 2 buttons in a dropdown menu
+---
 
-#### Scenario: Dropdown button click triggers the correct action
-- **GIVEN** a SearchTable with a folded action button labeled "重置密码" with an onClick handler
-- **WHEN** the user clicks "重置密码" in the dropdown menu
-- **THEN** the onClick handler SHALL be called with the correct row data
+### 需求：SearchTable 应在表格上方提供工具栏插槽
+SearchTable 在筛选栏和表格之间提供一个默认插槽，用于放置工具栏按钮（如"新增用户"）。
+
+#### 场景：工具栏插槽渲染自定义内容
+- **给定** SearchTable 的模板中使用了 `<template #default><el-button>新增用户</el-button></template>`
+- **当** 组件渲染时
+- **那么** 工具栏区域应包含"新增用户"按钮
+
+---
+
+### 需求：SearchTable 应接受 fetchApi 作为必需的函数 prop
+SearchTable 要求 `fetchApi` prop 是一个函数 `(params: QueryParams) => Promise<{ rows: T[]; total: number }>`。组件应在挂载时及搜索/重置/分页变化时自动调用它。
+
+#### 场景：挂载时自动获取数据
+- **给定** SearchTable 有有效的 fetchApi
+- **当** 组件挂载时
+- **那么** fetchApi 应被调用，默认参数为 page=1, size=10
+
+#### 场景：fetchApi 接收到正确的参数
+- **给定** SearchTable 包含查询字段和 fetchApi
+- **当** 用户填写用户名并点击搜索时
+- **那么** fetchApi 应被调用，参数包含 `{ page: 1, size: 10, username: 'admin' }`
+
+---
+
+### 需求：SearchTable 应支持 formConfig prop 以集成 FormBuilder 的 CRUD 功能
+SearchTable 应接受 `formConfig` prop。当存在时，SearchTable 应在工具栏渲染"新增"按钮，在操作列渲染"编辑"/"删除"按钮。组件应内部管理弹窗的打开/关闭状态、表单数据绑定和 CRUD API 调用。
+
+#### 场景：formConfig 渲染默认操作按钮
+- **给定** SearchTable 的 `formConfig` 包含 `{ fields: [...], createApi, updateApi, deleteApi }`
+- **当** 组件渲染时
+- **那么** 工具栏应包含"新增"按钮，每行应包含"编辑"和"删除"按钮
+
+#### 场景：新增按钮打开空表单弹窗
+- **给定** SearchTable 有 formConfig
+- **当** 用户点击"新增"按钮时
+- **那么** 应打开一个标题为"新增"的弹窗，表单为空
+
+#### 场景：编辑按钮获取详情并打开表单弹窗
+- **给定** SearchTable 的 formConfig 包含 `getApi: (id) => fetchUser(id)`
+- **当** 用户点击某行的"编辑"按钮时
+- **那么** getApi 应以该行 id 被调用，然后打开弹窗，表单填充获取到的数据
+
+#### 场景：删除按钮显示确认弹窗并调用 deleteApi
+- **给定** SearchTable 的 formConfig 包含 `deleteApi: (id) => deleteUser(id)`
+- **当** 用户点击某行的"删除"按钮并确认时
+- **那么** deleteApi 应以该行 id 被调用，列表刷新
+
+#### 场景：表单提交触发创建或更新
+- **给定** SearchTable 的 formConfig 包含 `createApi` 和 `updateApi`
+- **当** 用户在弹窗中填写表单并点击"确定"时
+- **那么** 新增模式下以表单数据调用 createApi，编辑模式下以 id 和表单数据调用 updateApi，弹窗关闭，列表刷新
+
+#### 场景：actionButtons 覆盖 formConfig 默认按钮
+- **给定** SearchTable 同时有 `formConfig` 和 `actionButtons`
+- **当** 组件渲染时
+- **那么** 操作列应渲染 `actionButtons` 而非默认的"编辑"/"删除"按钮
+
+#### 场景：空 actionButtons 隐藏操作列
+- **给定** SearchTable 有 `formConfig` 且 `actionButtons: []`
+- **当** 组件渲染时
+- **那么** 不应渲染操作列
+
+#### 场景：无 formConfig 且无 actionButtons 时不渲染操作列
+- **给定** SearchTable 没有 `formConfig` 也没有 `actionButtons`
+- **当** 组件渲染时
+- **那么** 不应渲染操作列
+
+---
+
+### 需求：SearchTable 应将超出 maxVisibleButtons 的操作按钮折叠到"更多"下拉菜单
+SearchTable 应接受 `maxVisibleButtons` prop（默认 3）。前 N 个按钮直接显示在操作列中，剩余按钮隐藏在 el-dropdown 中，通过一个带向下箭头的"更多"按钮触发。
+
+#### 场景：按钮数在限制内时直接显示
+- **给定** SearchTable 的 `maxVisibleButtons: 3` 且有 3 个操作按钮
+- **当** 表格渲染时
+- **那么** 所有 3 个按钮应直接显示在操作列中，无下拉菜单
+
+#### 场景：按钮数超出限制时折叠到下拉
+- **给定** SearchTable 的 `maxVisibleButtons: 2` 且有 4 个操作按钮
+- **当** 表格渲染时
+- **那么** 前 2 个按钮应直接显示，同时出现带向下箭头的"更多"按钮，点击后下拉展开剩余 2 个按钮
+
+#### 场景：下拉菜单中的按钮点击触发正确操作
+- **给定** SearchTable 有一个被折叠的按钮，标签为"重置密码"，绑定了 onClick 处理函数
+- **当** 用户在下拉菜单中点击"重置密码"时
+- **那么** onClick 处理函数应被调用，并传入正确的行数据
