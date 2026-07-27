@@ -20,6 +20,7 @@
 - [ ] 3.2 实现 v-model 双向绑定（modelValue / update:modelValue）
 - [ ] 3.3 实现布局配置（single / double / grid 三种布局模式）
 - [ ] 3.4 实现表单验证集成（支持 rules 配置，暴露 validate/validateField/resetFields 方法）
+- [ ] 3.5 实现字段 onChange 回调（handleUpdate 中调用 onChange，返回 false 则拒绝变更回退到旧值）
 
 ## 4. ReferencePicker 引用查找组件
 

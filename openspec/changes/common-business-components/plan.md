@@ -113,6 +113,8 @@ export interface FormField {
   span?: number // 栅格占列数
   slotName?: string
   props?: Record<string, any> // 透传给 el-* 组件的额外属性
+  // 值变更回调。返回 false / Promise<false> 则拒绝变更，回退到旧值
+  onChange?: (newVal: any, oldVal: any, formData: Record<string, any>) => boolean | Promise<boolean>
 }
 
 // 布局类型
@@ -342,7 +344,21 @@ const emit = defineEmits<{
 const formRef = ref()
 
 function handleUpdate(prop: string, value: any) {
-  emit('update:modelValue', { ...props.modelValue, [prop]: value })
+  const field = props.fields.find(f => f.prop === prop)
+  if (field?.onChange) {
+    const oldVal = props.modelValue[prop]
+    const result = field.onChange(value, oldVal, { ...props.modelValue })
+    if (result instanceof Promise) {
+      result.then(accepted => {
+        if (accepted !== false) emit('update:modelValue', { ...props.modelValue, [prop]: value })
+      })
+    } else if (result !== false) {
+      emit('update:modelValue', { ...props.modelValue, [prop]: value })
+    }
+    // result === false: 拒绝变更，不回写
+  } else {
+    emit('update:modelValue', { ...props.modelValue, [prop]: value })
+  }
 }
 
 async function validate(): Promise<boolean> {

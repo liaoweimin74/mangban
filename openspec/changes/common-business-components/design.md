@@ -47,7 +47,14 @@
 - **理由**：避免父组件 overflow:hidden 截断弹窗，保证弹窗在 z-index 最高层
 - **替代方案**：使用 el-dialog append-to-body — 功能一致，但 Teleport 更直接
 
-### 5. 组件文件结构
+### 5. 表单字段支持 onChange 回调，可在值变更前拦截或拒绝
+
+- **决策**：`FormField` 定义增加 `onChange?: (newVal: any, oldVal: any, formData: Record<string, any>) => boolean | Promise<boolean>` 回调
+- **理由**：业务场景中常有字段联动（如选择组织后自动填充编码、选择部门后校验权限），需要同步或异步校验后决定是否接受变更
+- **行为**：onChange 返回 `false` 或 `Promise<false>` 时，字段值回退到旧值；返回 `true` 或 `undefined` 时正常更新
+- **替代方案**：外部 watch 监听 modelValue 变化后手动回滚 — 时序难以控制，可能触发多余请求
+
+### 6. 组件文件结构
 
 ```
 src/components/business/
@@ -153,6 +160,20 @@ const fields: FormField[] = [
   { type: 'tree-select', label: '组织机构', prop: 'orgId',
     treeProps: { data: orgTree, props: { label: 'label', value: 'id', children: 'children' } } },
   { type: 'select', label: '角色', prop: 'roleIds', options: roleOptions },
+  // 联动：选择组织后自动校验该组织是否允许新用户注册
+  { type: 'tree-select', label: '所属组织', prop: 'orgId',
+    treeProps: { data: orgTree, props: { label: 'label', value: 'id' } },
+    onChange: async (newVal, oldVal, formData) => {
+      if (!newVal) return true
+      const res = await checkOrgAvailable(newVal)
+      if (!res.available) {
+        ElMessage.warning('该组织暂不接受新用户')
+        return false // 拒绝变更，值回退
+      }
+      return true
+    }
+  },
+]
 ]
 
 async function handleSubmit() {

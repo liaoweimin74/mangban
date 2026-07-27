@@ -87,3 +87,28 @@ FormBuilder SHALL expose `validate()` and `resetFields()` methods accessible thr
 - **GIVEN** a FormBuilder with filled form data
 - **WHEN** the parent calls `formRef.resetFields()`
 - **THEN** all fields SHALL be reset to their initial values
+
+---
+
+### Requirement: FormBuilder SHALL support onChange callback per field to intercept or accept value changes
+Each `FormField` SHALL accept an optional `onChange` function `(newVal: any, oldVal: any, formData: Record<string, any>) => boolean | Promise<boolean>`. When the callback returns `false` or a Promise resolving to `false`, the field value SHALL revert to the old value. Otherwise the value SHALL update normally.
+
+#### Scenario: onChange returns false, value is rejected
+- **GIVEN** a FormBuilder with a field `{ type: 'input', label: '编码', prop: 'code', onChange: (newVal) => newVal.length <= 10 }`
+- **WHEN** the user types a value longer than 10 characters
+- **THEN** the field value SHALL NOT be updated and the old value SHALL be preserved
+
+#### Scenario: onChange returns true, value is accepted
+- **GIVEN** a FormBuilder with a field `{ type: 'input', label: '编码', prop: 'code', onChange: (newVal) => newVal.length <= 10 }`
+- **WHEN** the user types a value of 5 characters
+- **THEN** the field value SHALL be updated to the new value
+
+#### Scenario: onChange returns Promise<false>, value is rejected asynchronously
+- **GIVEN** a FormBuilder with a field `{ type: 'select', label: '组织', prop: 'orgId', onChange: async (newVal) => { const res = await checkOrg(newVal); return res.valid } }`
+- **WHEN** the user selects an org and the async check returns `{ valid: false }`
+- **THEN** the field value SHALL NOT be updated
+
+#### Scenario: onChange receives oldVal and formData context
+- **GIVEN** a FormBuilder with fields `[{ prop: 'type', ... }, { prop: 'category', onChange: (newVal, oldVal, formData) => formData.type === 'A' }]`
+- **WHEN** the user changes category while type is 'A'
+- **THEN** onChange SHALL receive the current value of type via formData
