@@ -53,8 +53,8 @@ describe('ReferencePicker — 弹窗交互', () => {
     const wrapper = createWrapper()
     await wrapper.find('input').trigger('click')
     await nextTick()
-    // 弹窗应该可见（Element Plus 的 dialog 在 jsdom 中可能不完全渲染）
-    expect(wrapper.find('.el-dialog').exists() || wrapper.html().includes('dialog')).toBeTruthy()
+    // append-to-body 导致弹窗渲染到 document.body
+    expect(document.body.querySelector('.el-dialog') !== null || wrapper.html().includes('dialog')).toBeTruthy()
   })
 
   it('disabled 时点击不打开弹窗', async () => {
@@ -83,7 +83,8 @@ describe('ReferencePicker — 数据获取', () => {
     await wrapper.find('input').trigger('click')
     await nextTick()
     await nextTick()
-    expect(wrapper.text()).toContain('张三')
+    // append-to-body 导致弹窗渲染到 body，不在 wrapper 内
+    expect(document.body.textContent || '').toContain('张三')
   })
 })
 

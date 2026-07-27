@@ -268,11 +268,6 @@ const dropdownButtons = computed(() =>
   resolvedActionButtons.value.slice(props.maxVisibleButtons),
 )
 
-function handleDropdownAction(row: any, command: string) {
-  const btn = resolvedActionButtons.value.find((b) => b.label === command)
-  if (btn) btn.onClick(row)
-}
-
 function initSearchDefaults() {
   const defaults: Record<string, any> = {}
   for (const field of props.searchFields) {

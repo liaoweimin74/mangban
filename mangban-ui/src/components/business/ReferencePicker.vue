@@ -14,6 +14,7 @@
       :title="placeholder || '选择数据'"
       width="700px"
       :close-on-click-modal="false"
+      append-to-body
     >
       <div style="margin-bottom: 12px; display: flex; gap: 8px">
         <el-input
