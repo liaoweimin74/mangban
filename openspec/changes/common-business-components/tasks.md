@@ -1,6 +1,6 @@
 ## 1. 公共类型定义
 
-- [ ] 1.1 创建 `src/components/business/types.ts`，定义 SearchTable 的 searchFields、columns、actionButtons 等类型接口
+- [ ] 1.1 创建 `src/components/business/types.ts`，定义 SearchTable 的 searchFields、columns、actionButtons、formConfig 等类型接口
 - [ ] 1.2 定义 FormBuilder 的 field definition、layout 等类型接口
 - [ ] 1.3 定义 ReferencePicker 的 props 类型接口
 
@@ -9,10 +9,12 @@
 - [ ] 2.1 创建 `src/components/business/SearchTable.vue`，实现搜索栏渲染逻辑（根据 searchFields 配置渲染不同字段类型）
 - [ ] 2.2 实现搜索/重置/导出三个按钮，靠右对齐，分别触发查询、重置、导出事件
 - [ ] 2.3 实现表格渲染（根据 columns 配置渲染列，支持 formatter 和自定义 slot）
-- [ ] 2.4 实现操作列按钮（根据 actionButtons 配置渲染操作按钮，支持权限校验）
+- [ ] 2.4 实现操作列：formConfig 存在时默认生成"编辑"/"删除"按钮，actionButtons 显式传入时覆盖默认
 - [ ] 2.5 实现分页导航（el-pagination，绑定 total/page/size，响应 size-change 和 current-change）
 - [ ] 2.6 实现数据获取逻辑（onMounted 自动调用 fetchApi，search/reset/pagination 变化时重新请求）
 - [ ] 2.7 实现 loading 状态和 toolbar slot
+- [ ] 2.8 实现表单弹窗集成：formConfig 存在时渲染 el-dialog + FormBuilder，管理弹窗打开/关闭/数据绑定
+- [ ] 2.9 实现 CRUD 方法：handleCreate（空表单）、handleEdit（getApi 获取详情）、handleDelete（确认后删除）、handleDialogSubmit（提交后刷新列表）
 
 ## 3. FormBuilder 表单组件
 

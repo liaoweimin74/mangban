@@ -5,9 +5,9 @@
 ## What Changes
 
 **SearchTable 列表页组件**
-- From: 每个页面手写 el-card + el-form（搜索栏）+ el-table + el-pagination 模板，重复编写 fetchList/handleSearch/handleReset 等方法
-- To: 通过声明 searchFields、columns、actionButtons 配置，组件自动渲染搜索栏、表格、分页，自动调用 fetchApi 获取数据
-- Reason: 消除重复模式，提升开发效率
+- From: 每个页面手写 el-card + el-form（搜索栏）+ el-table + el-pagination 模板，重复编写 fetchList/handleSearch/handleReset 等方法，还需额外手写弹窗表单和 CRUD 事件处理
+- To: 通过声明 searchFields、columns、actionButtons 配置，组件自动渲染搜索栏、表格、分页，自动调用 fetchApi 获取数据。通过 formConfig 传入 FormBuilder 配置后，自动集成表单弹窗和 CRUD 按钮（新增/编辑/删除），actionButtons 可覆盖默认操作按钮
+- Reason: 消除重复模式，提升开发效率；组合模式将典型 CRUD 页面从 210 行缩至约 50 行
 - Impact: 非破坏性，新页面新用法，旧页面不变
 
 **FormBuilder 表单组件**

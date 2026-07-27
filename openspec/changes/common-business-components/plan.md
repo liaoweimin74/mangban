@@ -94,6 +94,29 @@ export interface SearchTableProps<T = any> {
   pageSizes?: number[]
   showExport?: boolean
   exportLoading?: boolean
+  // 集成 FormBuilder 的 CRUD 配置
+  formConfig?: FormConfig<T>
+}
+
+// 集成表单配置
+export interface FormConfig<T = any> {
+  fields: FormField[]
+  createApi?: (data: any) => Promise<any>
+  updateApi?: (id: number | string, data: any) => Promise<any>
+  deleteApi?: (id: number | string) => Promise<any>
+  getApi?: (id: number | string) => Promise<T>
+  layout?: FormLayout
+  labelWidth?: string
+  dialogWidth?: string
+  dialogTitle?: { create?: string; edit?: string }
+  // 新增/编辑前钩子，返回 false 阻止操作
+  beforeCreate?: () => boolean | Promise<boolean>
+  beforeEdit?: (row: T) => boolean | Promise<boolean>
+  beforeDelete?: (row: T) => boolean | Promise<boolean>
+  // 操作成功后回调
+  afterCreate?: (result: any) => void
+  afterUpdate?: (result: any) => void
+  afterDelete?: () => void
 }
 ```
 
@@ -167,8 +190,10 @@ export interface ReferencePickerProps<T = any> {
 ```vue
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
-import { Search, Refresh, Download } from '@element-plus/icons-vue'
-import type { SearchField, TableColumn, ActionButton, QueryParams, SearchTableProps } from './types'
+import { Search, Refresh, Download, Plus } from '@element-plus/icons-vue'
+import { ElMessage, ElMessageBox } from 'element-plus'
+import type { SearchField, TableColumn, ActionButton, QueryParams, SearchTableProps, FormConfig } from './types'
+import FormBuilder from './FormBuilder.vue'
 
 const props = withDefaults(defineProps<SearchTableProps>(), {
   defaultPageSize: 10,
@@ -187,10 +212,42 @@ const loading = ref(false)
 const list = ref<any[]>([])
 const total = ref(0)
 
-// 构建初始查询参数
 const query = reactive<QueryParams>({ page: 1, size: props.defaultPageSize })
-// 初始化 searchFields 的默认值
 const initialQuery = ref<Record<string, any>>({})
+
+// 表单弹窗状态
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
+const isEdit = ref(false)
+const editId = ref<number | string>(0)
+const formData = ref<Record<string, any>>({})
+const formLoading = ref(false)
+const formRef = ref()
+
+// 计算操作列按钮：formConfig 存在时生成默认按钮
+const resolvedActionButtons = computed<ActionButton[]>(() => {
+  if (props.actionButtons !== undefined) return props.actionButtons // 显式传入，包括 []
+  if (props.formConfig) return getDefaultActions()
+  return []
+})
+
+function getDefaultActions(): ActionButton[] {
+  const btns: ActionButton[] = []
+  if (props.formConfig?.updateApi) {
+    btns.push({
+      label: '编辑', type: 'primary', permission: props.formConfig.editPermission,
+      onClick: (row) => handleEdit(row)
+    })
+  }
+  if (props.formConfig?.deleteApi) {
+    btns.push({
+      label: '删除', type: 'danger', confirm: '确定删除该记录吗？',
+      permission: props.formConfig.deletePermission,
+      onClick: (row) => handleDelete(row)
+    })
+  }
+  return btns
+}
 // ... 后续逻辑
 </script>
 ```
@@ -222,25 +279,28 @@ const initialQuery = ref<Record<string, any>>({})
 </el-card>
 ```
 
-- [ ] **Step 3: 实现工具栏 slot 和表格渲染**
+- [ ] **Step 3: 实现工具栏 slot、表格渲染和表单弹窗**
 
 ```vue
 <el-card>
-  <!-- 工具栏 slot -->
-  <div v-if="$slots.default" style="margin-bottom: 12px">
+  <!-- 工具栏 slot + 新增按钮 -->
+  <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px">
     <slot />
+    <el-button v-if="formConfig && $slots.default === undefined" type="primary" :icon="Plus"
+      v-permission="formConfig.createPermission" @click="handleCreate">新增</el-button>
   </div>
   <el-table :data="list" v-loading="loading" border>
-    <el-table-column v-for="col in columns" :key="col.prop || col.label" :prop="col.prop" :label="col.label" :width="col.width" :min-width="col.minWidth" :align="col.align" :fixed="col.fixed" :formatter="col.formatter">
+    <el-table-column v-for="col in columns" :key="col.prop || col.label" :prop="col.prop" :label="col.label"
+      :width="col.width" :min-width="col.minWidth" :align="col.align" :fixed="col.fixed" :formatter="col.formatter">
       <template #default="{ row, column, $index }" v-if="col.slotName && $slots[col.slotName]">
         <slot :name="col.slotName" :row="row" :column="column" :$index="$index" />
       </template>
     </el-table-column>
     <!-- 操作列 -->
-    <el-table-column v-if="actionButtons?.length" label="操作" :width="actionColumnWidth" fixed="right">
+    <el-table-column v-if="resolvedActionButtons.length" label="操作" :width="actionColumnWidth" fixed="right">
       <template #default="{ row }">
         <div class="flex items-center gap-1 whitespace-nowrap">
-          <template v-for="btn in actionButtons" :key="btn.label">
+          <template v-for="btn in resolvedActionButtons" :key="btn.label">
             <el-popconfirm v-if="btn.confirm" :title="btn.confirm" @confirm="btn.onClick(row)">
               <template #reference>
                 <el-button size="small" :type="btn.type || 'text'" v-permission="btn.permission">{{ btn.label }}</el-button>
@@ -252,6 +312,29 @@ const initialQuery = ref<Record<string, any>>({})
       </template>
     </el-table-column>
   </el-table>
+  <!-- 分页 -->
+  <div v-if="total > 0" style="margin-top: 16px; display: flex; justify-content: flex-end">
+    <el-pagination
+      v-model:current-page="query.page" v-model:page-size="query.size"
+      :total="total" :page-sizes="pageSizes"
+      layout="total, sizes, prev, pager, next, jumper"
+      @size-change="fetchList()" @current-change="fetchList()"
+    />
+  </div>
+</el-card>
+
+<!-- 集成表单弹窗 -->
+<el-dialog v-if="formConfig" v-model="dialogVisible" :title="dialogTitle" :width="formConfig.dialogWidth || '500px'"
+  :close-on-click-modal="false" @close="handleDialogClose">
+  <FormBuilder
+    ref="formRef" v-model="formData" :fields="formConfig.fields"
+    :layout="formConfig.layout" :label-width="formConfig.labelWidth || '80px'"
+  />
+  <template #footer>
+    <el-button @click="dialogVisible = false">取消</el-button>
+    <el-button type="primary" :loading="formLoading" @click="handleDialogSubmit">确定</el-button>
+  </template>
+</el-dialog>
 ```
 
 - [ ] **Step 4: 实现数据获取和分页逻辑**
@@ -311,6 +394,82 @@ onMounted(() => {
     @current-change="fetchList()"
   />
 </div>
+```
+
+- [ ] **Step 6: 实现表单 CRUD 逻辑**（仅当 formConfig 存在时启用）
+
+```typescript
+function handleCreate() {
+  isEdit.value = false
+  editId.value = 0
+  formData.value = {}
+  dialogTitle.value = formConfig?.dialogTitle?.create || '新增'
+  dialogVisible.value = true
+}
+
+async function handleEdit(row: any) {
+  if (formConfig?.beforeEdit) {
+    const ok = await formConfig.beforeEdit(row)
+    if (ok === false) return
+  }
+  isEdit.value = true
+  editId.value = row.id
+  dialogTitle.value = formConfig?.dialogTitle?.edit || '编辑'
+
+  if (formConfig?.getApi) {
+    formLoading.value = true
+    try {
+      const res = await formConfig.getApi(row.id)
+      formData.value = res
+    } finally {
+      formLoading.value = false
+    }
+  } else {
+    // 没有 getApi 时直接用行数据填充表单
+    formData.value = { ...row }
+  }
+  dialogVisible.value = true
+}
+
+async function handleDelete(row: any) {
+  if (formConfig?.beforeDelete) {
+    const ok = await formConfig.beforeDelete(row)
+    if (ok === false) return
+  }
+  try {
+    await formConfig?.deleteApi?.(row.id)
+    ElMessage.success('删除成功')
+    formConfig?.afterDelete?.()
+    fetchList()
+  } catch {
+    // 错误已在 http 拦截器中处理
+  }
+}
+
+async function handleDialogSubmit() {
+  const valid = await formRef.value?.validate()
+  if (!valid) return
+
+  formLoading.value = true
+  try {
+    if (isEdit.value) {
+      await formConfig?.updateApi?.(editId.value, formData.value)
+      formConfig?.afterUpdate?.(formData.value)
+    } else {
+      await formConfig?.createApi?.(formData.value)
+      formConfig?.afterCreate?.(formData.value)
+    }
+    ElMessage.success(isEdit.value ? '更新成功' : '创建成功')
+    dialogVisible.value = false
+    fetchList()
+  } finally {
+    formLoading.value = false
+  }
+}
+
+function handleDialogClose() {
+  formData.value = {}
+}
 ```
 
 ---

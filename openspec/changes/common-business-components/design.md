@@ -20,6 +20,7 @@
 - 不实现低代码可视化配置平台
 - 不修改后端 API 接口格式
 - 不实现导出功能的具体实现（只提供导出事件钩子，由调用方实现）
+- 不强制 SearchTable 必须使用 FormBuilder — 两者可独立使用，也可组合使用
 
 ## Decisions
 
@@ -54,7 +55,15 @@
 - **行为**：onChange 返回 `false` 或 `Promise<false>` 时，字段值回退到旧值；返回 `true` 或 `undefined` 时正常更新
 - **替代方案**：外部 watch 监听 modelValue 变化后手动回滚 — 时序难以控制，可能触发多余请求
 
-### 6. 组件文件结构
+### 6. SearchTable 与 FormBuilder 组合：通过 formConfig 集成表单弹窗
+
+- **决策**：SearchTable 增加 `formConfig` prop，传入 `FormBuilder` 的字段定义、API 配置后，组件内部自动管理弹窗状态和 CRUD 流程
+- **默认操作列**：当 `formConfig` 存在时，操作列默认显示"新增"（工具栏）、"编辑"、"删除"三个按钮，分别对应 createApi/updateApi/deleteApi
+- **自定义覆盖**：如果同时传入 `actionButtons`，则优先使用 `actionButtons`；如果 `actionButtons` 传空数组 `[]`，则隐藏操作列
+- **理由**：消除每个 CRUD 页面写弹窗模板 + 表单模板 + CRUD 事件处理的大量重复代码，典型页面从 200+ 行缩至 50 行
+- **替代方案**：外部自行组合 SearchTable + el-dialog + FormBuilder — 灵活但每个页面重复编写弹窗逻辑，违背组件化初衷
+
+### 7. 组件文件结构
 
 ```
 src/components/business/
@@ -76,21 +85,19 @@ src/components/business/
 
 ## Usage Examples
 
-### SearchTable — 用户列表页
+### SearchTable + FormBuilder — 用户管理页（组合模式）
 
-改造 `UserPage.vue`，原来手写 210 行模板代码，用 SearchTable 缩减为约 80 行：
+`formConfig` 传入后，SearchTable 自动集成表单弹窗和 CRUD 按钮，页面缩减到极致：
 
 ```vue
 <script setup lang="ts">
-import { ref } from 'vue'
-import { ElMessage, ElMessageBox } from 'element-plus'
 import { SearchTable } from '@/components/business'
-import { getUserList, deleteUser, updateUserStatus } from '@/api/user'
-import type { SearchField, TableColumn, ActionButton } from '@/components/business'
+import { getUserList, createUser, updateUser, deleteUser } from '@/api/user'
+import { getOrgTree } from '@/api/org'
+import type { SearchField, TableColumn, FormField } from '@/components/business'
 
 const searchFields: SearchField[] = [
   { type: 'input', label: '用户名', prop: 'username', placeholder: '输入用户名' },
-  { type: 'input', label: '昵称', prop: 'nickname', placeholder: '输入昵称' },
   { type: 'select', label: '状态', prop: 'status', placeholder: '选择状态',
     options: [{ label: '启用', value: 1 }, { label: '停用', value: 0 }] }
 ]
@@ -99,32 +106,38 @@ const columns: TableColumn[] = [
   { prop: 'username', label: '用户名', width: 120 },
   { prop: 'nickname', label: '昵称', width: 120 },
   { prop: 'email', label: '邮箱', minWidth: 160 },
-  { prop: 'phone', label: '手机号', width: 140 },
   { prop: 'orgName', label: '组织机构', width: 140 },
-  { prop: 'createdAt', label: '创建时间', width: 170 },
-  { label: '状态', width: 80, align: 'center', slotName: 'status' }
+  { label: '状态', width: 80, slotName: 'status' }
 ]
 
-const actionButtons: ActionButton[] = [
-  { label: '编辑', type: 'primary', permission: 'system:user:edit',
-    onClick: (row) => handleEdit(row) },
-  { label: '删除', type: 'danger', confirm: '确定删除吗？',
-    permission: 'system:user:delete',
-    onClick: (row) => deleteUser(row.id).then(() => { ElMessage.success('删除成功'); /* refresh */ }) },
+const formFields: FormField[] = [
+  { type: 'input', label: '用户名', prop: 'username', placeholder: '请输入用户名',
+    rules: [{ required: true, message: '请输入用户名' }],
+    props: { disabled: true } }, // 编辑时禁用
+  { type: 'input', label: '昵称', prop: 'nickname', placeholder: '请输入昵称',
+    rules: [{ required: true, message: '请输入昵称' }] },
+  { type: 'input', label: '邮箱', prop: 'email', placeholder: '请输入邮箱' },
+  { type: 'tree-select', label: '组织机构', prop: 'orgId',
+    treeProps: { data: orgTree, props: { label: 'label', value: 'id' } } },
+  { type: 'select', label: '角色', prop: 'roleIds', options: roleOptions },
 ]
-
-function handleEdit(row: any) { /* 打开编辑弹窗 */ }
 </script>
 
 <template>
   <SearchTable
     :search-fields="searchFields"
     :columns="columns"
-    :action-buttons="actionButtons"
     :fetch-api="(params) => getUserList(params).then(r => r.data)"
+    :form-config="{
+      fields: formFields,
+      createApi: (data) => createUser(data),
+      updateApi: (id, data) => updateUser(id, data),
+      deleteApi: (id) => deleteUser(id),
+      layout: 'double',
+      labelWidth: '80px',
+      dialogWidth: '600px'
+    }"
   >
-    <!-- 工具栏插槽 -->
-    <el-button type="primary" v-permission="'system:user:add'">新增用户</el-button>
     <!-- 自定义状态列 -->
     <template #status="{ row }">
       <el-switch :model-value="row.status === 1"
@@ -132,6 +145,33 @@ function handleEdit(row: any) { /* 打开编辑弹窗 */ }
     </template>
   </SearchTable>
 </template>
+```
+
+以上代码约 50 行，对比原来的 UserPage.vue 约 210 行，缩减约 75%。SearchTable 自动处理：
+- 工具栏"新增用户"按钮 → 打开表单弹窗（空表单）
+- 操作列"编辑"按钮 → 调用 getApi 获取详情 → 填充表单弹窗
+- 操作列"删除"按钮 → 确认弹窗 → 调用 deleteApi → 刷新列表
+- 表单提交 → 调用 createApi / updateApi → 关闭弹窗 → 刷新列表
+
+### SearchTable — 纯列表（独立使用）
+
+如果只需要列表不绑定表单，仍可使用独立的 SearchTable：
+
+```vue
+<SearchTable
+  :search-fields="searchFields"
+  :columns="columns"
+  :action-buttons="actionButtons"
+  :fetch-api="(params) => getUserList(params).then(r => r.data)"
+>
+  <!-- 工具栏插槽 -->
+  <el-button type="primary">新增用户</el-button>
+  <!-- 自定义状态列 -->
+  <template #status="{ row }">
+    <el-switch :model-value="row.status === 1"
+      @change="updateUserStatus(row.id, row.status === 1 ? 0 : 1)" />
+  </template>
+</SearchTable>
 ```
 
 ### FormBuilder — 用户表单

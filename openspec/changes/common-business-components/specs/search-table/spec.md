@@ -107,3 +107,48 @@ SearchTable SHALL require a `fetchApi` prop that is a function `(params: QueryPa
 - **GIVEN** a SearchTable with search fields and fetchApi
 - **WHEN** the user fills username and clicks search
 - **THEN** fetchApi SHALL be called with `{ page: 1, size: 10, username: 'admin' }`
+
+---
+
+### Requirement: SearchTable SHALL support formConfig prop for integrated CRUD with FormBuilder
+SearchTable SHALL accept a `formConfig` prop. When present, SearchTable SHALL render a "新增" button in the toolbar, and "编辑"/"删除" buttons in the action column. The component SHALL manage the dialog open/close state, form data binding, and CRUD API calls internally.
+
+#### Scenario: formConfig renders default action buttons
+- **GIVEN** a SearchTable with `formConfig` containing `{ fields: [...], createApi, updateApi, deleteApi }`
+- **WHEN** the component renders
+- **THEN** the toolbar SHALL contain a "新增用户" button and each row SHALL have "编辑" and "删除" buttons
+
+#### Scenario: New button opens empty form dialog
+- **GIVEN** a SearchTable with formConfig
+- **WHEN** the user clicks "新增用户"
+- **THEN** a dialog SHALL open with title "新增" and an empty FormBuilder
+
+#### Scenario: Edit button fetches detail and opens form dialog
+- **GIVEN** a SearchTable with formConfig containing `getApi: (id) => fetchUser(id)`
+- **WHEN** the user clicks "编辑" on a row
+- **THEN** getApi SHALL be called with the row's id, and then a dialog SHALL open with the fetched data filled in the FormBuilder
+
+#### Scenario: Delete button shows confirm and calls deleteApi
+- **GIVEN** a SearchTable with formConfig containing `deleteApi: (id) => deleteUser(id)`
+- **WHEN** the user clicks "删除" on a row and confirms
+- **THEN** deleteApi SHALL be called with the row's id, and the list SHALL be refreshed
+
+#### Scenario: Form submit creates or updates
+- **GIVEN** a SearchTable with formConfig containing `createApi` and `updateApi`
+- **WHEN** the user fills the form and clicks "确定" in the dialog
+- **THEN** createApi SHALL be called with form data (for new) or updateApi SHALL be called with id and form data (for edit), then the dialog SHALL close and the list SHALL refresh
+
+#### Scenario: actionButtons overrides default formConfig buttons
+- **GIVEN** a SearchTable with both `formConfig` and `actionButtons`
+- **WHEN** the component renders
+- **THEN** the action column SHALL render `actionButtons` instead of the default "编辑"/"删除" buttons
+
+#### Scenario: empty actionButtons hides action column
+- **GIVEN** a SearchTable with `formConfig` and `actionButtons: []`
+- **WHEN** the component renders
+- **THEN** no action column SHALL be rendered
+
+#### Scenario: formConfig without formConfig renders no default action buttons
+- **GIVEN** a SearchTable without `formConfig` and without `actionButtons`
+- **WHEN** the component renders
+- **THEN** no action column SHALL be rendered
