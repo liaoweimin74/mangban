@@ -19,7 +19,7 @@
       <div style="margin-bottom: 12px; display: flex; gap: 8px">
         <el-input
           v-model="keyword"
-          placeholder="请输入关键字搜索"
+          :placeholder="searchPlaceholder || '请输入关键字搜索'"
           clearable
           @keyup.enter="handleSearch"
         />
@@ -69,6 +69,7 @@ import type { ReferencePickerProps, QueryParams } from './types'
 const props = withDefaults(defineProps<ReferencePickerProps>(), {
   mode: 'single',
   placeholder: '请选择',
+  searchPlaceholder: '请输入关键字搜索',
   disabled: false,
   clearable: true,
 })

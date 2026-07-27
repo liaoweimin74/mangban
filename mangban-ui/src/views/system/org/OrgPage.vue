@@ -33,7 +33,7 @@ function handleEdit(row: TreeNode) {
 
 async function handleSubmit() {
   try {
-    const data: any = { ...form, name: form.name }
+    const data: any = { ...form, orgName: form.name, orgCode: form.code }
     if (isEdit.value) {
       await updateOrg(editId.value, data)
       ElMessage.success('修改成功')

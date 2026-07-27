@@ -155,6 +155,7 @@ export interface ReferencePickerProps<T = any> {
   columns: TableColumn[]
   mode?: 'single' | 'multiple'
   placeholder?: string
+  searchPlaceholder?: string
   disabled?: boolean
   clearable?: boolean
 }

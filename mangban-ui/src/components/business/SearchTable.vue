@@ -247,7 +247,8 @@ function getDefaultActions(): ActionButton[] {
   if (props.formConfig?.updateApi) {
     btns.push({
       label: '编辑',
-      type: 'primary',
+      type: 'text',
+      size: 'small',
       permission: props.formConfig.editPermission,
       onClick: (row) => handleEdit(row),
     })
@@ -255,7 +256,8 @@ function getDefaultActions(): ActionButton[] {
   if (props.formConfig?.deleteApi) {
     btns.push({
       label: '删除',
-      type: 'danger',
+      type: 'text',
+      size: 'small',
       confirm: '确定删除该记录吗？',
       permission: props.formConfig.deletePermission,
       onClick: (row) => handleDelete(row),
