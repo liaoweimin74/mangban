@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { SearchTable } from '@/components/business'
 import type { SearchField, TableColumn, ActionButton, FormConfig } from '@/components/business/types'
@@ -21,7 +21,7 @@ onMounted(async () => {
 })
 
 // ---------- 搜索字段 ----------
-const searchFields: SearchField[] = [
+const searchFields = computed<SearchField[]>(() => [
   { type: 'input', label: '用户名', prop: 'username', placeholder: '输入用户名' },
   { type: 'input', label: '昵称', prop: 'nickname', placeholder: '输入昵称' },
   {
@@ -30,7 +30,7 @@ const searchFields: SearchField[] = [
     prop: 'orgId',
     placeholder: '选择组织',
     treeProps: {
-      data: [] as any[],
+      data: orgTree.value,
       props: { label: 'label', value: 'id', children: 'children' },
     },
     style: 'width: 200px',
@@ -47,7 +47,7 @@ const searchFields: SearchField[] = [
     ],
     style: 'width: 120px',
   },
-]
+])
 
 // ---------- 表格列 ----------
 const columns: TableColumn[] = [
@@ -104,14 +104,12 @@ const actionButtons: ActionButton[] = [
 
 // ---------- fetchApi ----------
 async function fetchApi(params: any) {
-  // 更新 treeProps.data（树数据异步加载）
-  searchFields[2].treeProps!.data = orgTree.value
   const res = await getUserList(params)
   return { rows: res.data.rows, total: res.data.total }
 }
 
 // ---------- 表单配置 ----------
-const formConfig: FormConfig<UserVO> = {
+const formConfig = computed<FormConfig<UserVO>>(() => ({
   fields: [
     { type: 'input', label: '用户名', prop: 'username', placeholder: '请输入用户名', rules: [{ required: true, message: '请输入用户名', trigger: 'blur' }] },
     { type: 'input', label: '昵称', prop: 'nickname', placeholder: '请输入昵称', rules: [{ required: true, message: '请输入昵称', trigger: 'blur' }] },
@@ -123,7 +121,7 @@ const formConfig: FormConfig<UserVO> = {
       prop: 'orgId',
       placeholder: '选择组织',
       treeProps: {
-        data: [] as any[],
+        data: orgTree.value,
         props: { label: 'label', value: 'id', children: 'children' },
       },
     },
@@ -133,7 +131,7 @@ const formConfig: FormConfig<UserVO> = {
       prop: 'roleIds',
       placeholder: '选择角色',
       props: { multiple: true },
-      options: [],
+      options: roleList.value.map((r) => ({ label: r.roleName, value: r.id })),
     },
   ],
   createApi: createUser,
@@ -144,18 +142,7 @@ const formConfig: FormConfig<UserVO> = {
   createPermission: 'system:user:add',
   editPermission: 'system:user:edit',
   deletePermission: 'system:user:delete',
-  beforeCreate: () => {
-    // 更新树数据和角色选项
-    formConfig.fields[4].treeProps!.data = orgTree.value
-    formConfig.fields[5].options = roleList.value.map((r) => ({ label: r.roleName, value: r.id }))
-    return true
-  },
-  beforeEdit: (row) => {
-    formConfig.fields[4].treeProps!.data = orgTree.value
-    formConfig.fields[5].options = roleList.value.map((r) => ({ label: r.roleName, value: r.id }))
-    return true
-  },
-}
+}))
 </script>
 
 <template>
