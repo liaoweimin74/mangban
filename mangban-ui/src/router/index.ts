@@ -23,7 +23,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'system/user',
         name: 'UserManagement',
-        component: () => import('@/views/system/user/UserPage.vue'),
+        component: () => import('@/views/system/user/UserPageEx.vue'),
         meta: { title: '用户管理' }
       },
       {

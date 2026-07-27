@@ -234,9 +234,12 @@ const actionColumnWidth = computed(() => {
 })
 
 const resolvedActionButtons = computed<ActionButton[]>(() => {
-  if (props.actionButtons !== undefined) return props.actionButtons
-  if (props.formConfig) return getDefaultActions()
-  return []
+  const defaults = props.formConfig ? getDefaultActions() : []
+  if (props.actionButtons !== undefined) {
+    // 合并：自定义按钮追加到默认按钮后面
+    return [...defaults, ...props.actionButtons]
+  }
+  return defaults
 })
 
 function getDefaultActions(): ActionButton[] {
@@ -381,4 +384,6 @@ async function handleDialogSubmit() {
 function handleDialogClose() {
   formData.value = {}
 }
+
+defineExpose({ fetchList })
 </script>
