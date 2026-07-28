@@ -3,3 +3,10 @@ export interface R<T = any> {
   data: T
   msg: string
 }
+
+export interface PageResult<T> {
+  total: number
+  page: number
+  size: number
+  rows: T[]
+}

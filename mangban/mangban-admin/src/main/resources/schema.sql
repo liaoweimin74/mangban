@@ -100,3 +100,48 @@ CREATE TABLE IF NOT EXISTS sys_role_menu (
     menu_id BIGINT NOT NULL,
     UNIQUE KEY uk_role_menu (role_id, menu_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- 装置层级表
+CREATE TABLE IF NOT EXISTS sys_location (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    parent_id BIGINT COMMENT '父级ID，NULL=根节点',
+    name VARCHAR(100) NOT NULL COMMENT '名称',
+    code VARCHAR(50) NOT NULL COMMENT '编码',
+    type VARCHAR(20) NOT NULL COMMENT '类型：FACTORY/PLANT/UNIT',
+    sort_order INT DEFAULT 0 COMMENT '排序',
+    remark VARCHAR(500) COMMENT '备注',
+    is_deleted INT DEFAULT 0,
+    created_by VARCHAR(50),
+    created_at DATETIME,
+    updated_by VARCHAR(50),
+    updated_at DATETIME,
+    UNIQUE KEY uk_location_code (code)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='装置层级';
+
+-- 隔离点台账表
+CREATE TABLE IF NOT EXISTS sys_isolation_point (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    unit_id BIGINT NOT NULL COMMENT '所属单元ID',
+    code VARCHAR(50) NOT NULL COMMENT '编码',
+    name VARCHAR(100) NOT NULL COMMENT '名称',
+    medium VARCHAR(50) COMMENT '介质',
+    pressure_rating VARCHAR(50) COMMENT '压力等级',
+    temperature_rating VARCHAR(50) COMMENT '温度等级',
+    hazard_level VARCHAR(20) COMMENT '危害等级',
+    point_type VARCHAR(50) COMMENT '点位类型',
+    blind_spec VARCHAR(100) COMMENT '适配盲板规格',
+    equipment_tag VARCHAR(50) COMMENT '关联设备位号',
+    pipeline_no VARCHAR(50) COMMENT '关联管线号',
+    status VARCHAR(20) DEFAULT 'OPEN' COMMENT '通盲状态：OPEN/BLIND',
+    occupy_status VARCHAR(20) DEFAULT 'FREE' COMMENT '占用状态：OCCUPIED/FREE',
+    remark VARCHAR(500) COMMENT '备注',
+    is_deleted INT DEFAULT 0,
+    created_by VARCHAR(50),
+    created_at DATETIME,
+    updated_by VARCHAR(50),
+    updated_at DATETIME,
+    UNIQUE KEY uk_ip_code (code),
+    KEY idx_unit_id (unit_id),
+    KEY idx_ip_status (status),
+    KEY idx_hazard_level (hazard_level)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='隔离点台账';
