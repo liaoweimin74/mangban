@@ -63,6 +63,12 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '隔离点台账' }
       },
       {
+        path: 'process/isolation-points/status',
+        name: 'IsolationPointStatus',
+        component: () => import('@/views/process/IsolationPointStatusPage.vue'),
+        meta: { title: '隔离点状态总览' }
+      },
+      {
         path: '404',
         name: 'NotFound',
         component: () => import('@/views/error/NotFoundPage.vue'),
