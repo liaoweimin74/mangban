@@ -66,6 +66,7 @@
           v-if="formConfig"
           type="primary"
           :icon="Plus"
+          :size="tableSize === 'small' ? 'small' : 'default'"
           v-permission="formConfig.createPermission"
           @click="handleCreate"
         >

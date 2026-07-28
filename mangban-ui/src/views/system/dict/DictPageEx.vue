@@ -11,8 +11,8 @@ const selectedType = ref<DictTypeVO | null>(null)
 
 // ========== 字典类型 ==========
 const typeSearchFields: SearchField[] = [
-  { type: 'input', label: '字典名称', prop: 'dictName', placeholder: '输入名称', style: 'width: 120px' },
-  { type: 'input', label: '字典编码', prop: 'dictCode', placeholder: '输入编码', style: 'width: 120px' },
+  { type: 'input', label: '字典名称', prop: 'dictName', placeholder: '输入名称', style: 'width: 80px' },
+  { type: 'input', label: '字典编码', prop: 'dictCode', placeholder: '输入编码', style: 'width: 80px' },
 ]
 
 const typeColumns: TableColumn[] = [
