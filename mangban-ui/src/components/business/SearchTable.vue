@@ -336,10 +336,10 @@ function handleExport() {
 }
 
 // --- CRUD ---
-function handleCreate() {
+function handleCreate(initialValues?: Record<string, any>) {
   isEdit.value = false
   editId.value = 0
-  formData.value = {}
+  formData.value = initialValues ? { ...initialValues } : {}
   dialogTitle.value = props.formConfig?.dialogTitle?.create || '新增'
   dialogVisible.value = true
 }
@@ -407,5 +407,5 @@ function handleDialogClose() {
   formData.value = {}
 }
 
-defineExpose({ fetchList })
+defineExpose({ fetchList, openFormDialog: handleCreate })
 </script>

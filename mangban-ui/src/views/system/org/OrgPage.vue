@@ -75,9 +75,6 @@ function findNode(tree: TreeNode[], id: number): TreeNode | null {
 </script>
 
 <template>
-  <div style="margin-bottom: 12px">
-    <el-button type="primary" @click="handleAddRoot">新增根组织</el-button>
-  </div>
   <SearchTable
     ref="searchTableRef"
     :search-fields="searchFields"
