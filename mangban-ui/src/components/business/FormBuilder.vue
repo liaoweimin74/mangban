@@ -131,9 +131,17 @@ const oldValues = ref<Record<string, any>>({})
 watch(
   () => props.modelValue,
   (val) => {
+    // 先清除旧 key，再写入新值，避免残留
+    const oldKeys = Object.keys(localModel)
+    const newKeys = Object.keys(val)
+    for (const key of oldKeys) {
+      if (!(key in val)) {
+        delete localModel[key]
+      }
+    }
     Object.assign(localModel, val)
     // 记录初始值
-    for (const key of Object.keys(val)) {
+    for (const key of newKeys) {
       if (!(key in oldValues.value)) {
         oldValues.value[key] = val[key]
       }
