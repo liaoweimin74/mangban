@@ -43,25 +43,26 @@ INSERT IGNORE INTO sys_menu (id, parent_id, menu_name, menu_type, permission, so
 (26, 6, '字典修改', 2, 'system:dict:update', 3, NOW(), NOW()),
 (27, 6, '字典删除', 2, 'system:dict:delete', 4, NOW(), NOW());
 
--- Insert process management menus
+-- Insert isolation point management menus
+-- Clean up old menus first (id 28-31 may exist from previous deployment)
+DELETE FROM sys_role_menu WHERE menu_id IN (28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41);
+DELETE FROM sys_menu WHERE id IN (28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41);
 INSERT IGNORE INTO sys_menu (id, parent_id, menu_name, menu_type, path, component, permission, icon, sort_order, created_at, updated_at) VALUES
-(28, NULL, '流程管理', 0, '/process', NULL, NULL, 'Connection', 2, NOW(), NOW()),
-(29, 28, '装置层级管理', 1, '/process/locations', 'process/Location/index', 'process:location:list', 'TrendCharts', 1, NOW(), NOW()),
-(30, 28, '隔离点台账', 1, '/process/isolation-points', 'process/IsolationPoint/index', 'process:isolation-point:list', 'List', 2, NOW(), NOW()),
-(31, 28, '状态台账总览', 1, '/process/isolation-points/status', 'process/IsolationPointStatus/index', 'process:isolation-point-status:list', 'DataView', 3, NOW(), NOW());
+(28, NULL, '隔离点管理', 0, '/process', NULL, NULL, 'Connection', 2, NOW(), NOW()),
+(29, 28, '隔离点台账', 1, '/process/isolation-points', 'process/IsolationPointManage/index', 'process:isolation-point:list', 'List', 1, NOW(), NOW());
 
--- Menu permissions for process management
+-- Menu permissions for isolation point management
 INSERT IGNORE INTO sys_menu (id, parent_id, menu_name, menu_type, permission, sort_order, created_at, updated_at) VALUES
 (32, 29, '装置层级查询', 2, 'process:location:query', 1, NOW(), NOW()),
 (33, 29, '装置层级新增', 2, 'process:location:create', 2, NOW(), NOW()),
 (34, 29, '装置层级修改', 2, 'process:location:update', 3, NOW(), NOW()),
 (35, 29, '装置层级删除', 2, 'process:location:delete', 4, NOW(), NOW()),
-(36, 30, '隔离点查询', 2, 'process:isolation-point:query', 1, NOW(), NOW()),
-(37, 30, '隔离点新增', 2, 'process:isolation-point:create', 2, NOW(), NOW()),
-(38, 30, '隔离点修改', 2, 'process:isolation-point:update', 3, NOW(), NOW()),
-(39, 30, '隔离点删除', 2, 'process:isolation-point:delete', 4, NOW(), NOW()),
-(40, 30, '隔离点状态切换', 2, 'process:isolation-point:status', 5, NOW(), NOW()),
-(41, 30, '隔离点占用切换', 2, 'process:isolation-point:occupy', 6, NOW(), NOW());
+(36, 29, '隔离点查询', 2, 'process:isolation-point:query', 1, NOW(), NOW()),
+(37, 29, '隔离点新增', 2, 'process:isolation-point:create', 2, NOW(), NOW()),
+(38, 29, '隔离点修改', 2, 'process:isolation-point:update', 3, NOW(), NOW()),
+(39, 29, '隔离点删除', 2, 'process:isolation-point:delete', 4, NOW(), NOW()),
+(40, 29, '隔离点状态切换', 2, 'process:isolation-point:status', 5, NOW(), NOW()),
+(41, 29, '隔离点占用切换', 2, 'process:isolation-point:occupy', 6, NOW(), NOW());
 
 -- Assign all menus to admin role
 INSERT IGNORE INTO sys_role_menu (role_id, menu_id)

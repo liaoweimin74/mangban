@@ -44,6 +44,9 @@ INSERT IGNORE INTO sys_menu (id, parent_id, menu_name, menu_type, permission, so
 (27, 6, '字典删除', 2, 'system:dict:delete', 4, NOW(), NOW());
 
 -- Insert isolation point management menus
+-- Clean up old menus first (id 28-31 may exist from previous deployment)
+DELETE FROM sys_role_menu WHERE menu_id IN (28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41);
+DELETE FROM sys_menu WHERE id IN (28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41);
 INSERT IGNORE INTO sys_menu (id, parent_id, menu_name, menu_type, path, component, permission, icon, sort_order, created_at, updated_at) VALUES
 (28, NULL, '隔离点管理', 0, '/process', NULL, NULL, 'Connection', 2, NOW(), NOW()),
 (29, 28, '隔离点台账', 1, '/process/isolation-points', 'process/IsolationPointManage/index', 'process:isolation-point:list', 'List', 1, NOW(), NOW());
