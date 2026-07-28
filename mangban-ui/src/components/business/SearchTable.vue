@@ -68,7 +68,7 @@
           :icon="Plus"
           :size="tableSize === 'small' ? 'small' : 'default'"
           v-permission="formConfig.createPermission"
-          @click="handleCreate"
+          @click="handleCreate(undefined)"
         >
           新增
         </el-button>
