@@ -47,7 +47,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'system/dict',
         name: 'DictManagement',
-        component: () => import('@/views/system/dict/DictPage.vue'),
+        component: () => import('@/views/system/dict/DictPageEx.vue'),
         meta: { title: '数据字典管理' }
       },
       {
