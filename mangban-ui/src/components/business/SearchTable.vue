@@ -8,6 +8,7 @@
             v-if="field.type === 'input'"
             v-model="query[field.prop]"
             :placeholder="field.placeholder"
+            :style="field.style || 'width: 180px'"
             clearable
           />
           <el-select
