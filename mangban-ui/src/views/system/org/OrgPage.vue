@@ -86,5 +86,6 @@ function findNode(tree: TreeNode[], id: number): TreeNode | null {
     :fetch-api="fetchApi"
     :form-config="formConfig"
     :tree-props="{ rowKey: 'id', children: 'children', defaultExpandAll: true }"
+    :show-search="false"
   />
 </template>

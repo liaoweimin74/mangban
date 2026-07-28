@@ -119,9 +119,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div style="margin-bottom: 12px">
-    <el-button type="primary" @click="handleAddRoot">新增根菜单</el-button>
-  </div>
   <SearchTable
     ref="searchTableRef"
     :search-fields="searchFields"
@@ -130,6 +127,7 @@ onMounted(async () => {
     :fetch-api="fetchApi"
     :form-config="formConfig"
     :tree-props="{ rowKey: 'id', children: 'children', defaultExpandAll: true }"
+    :show-search="false"
   >
     <template #icon="{ row }">
       <el-icon><component :is="row.icon || 'Menu'" /></el-icon>
