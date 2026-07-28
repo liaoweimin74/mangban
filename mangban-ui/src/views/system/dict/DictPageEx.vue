@@ -112,6 +112,7 @@ const dataActionButtons: ActionButton[] = [
         :action-buttons="typeActionButtons"
         :fetch-api="typeFetchApi"
         :form-config="typeFormConfig"
+        table-size="small"
         @row-click="handleTypeRowClick"
       />
     </el-card>
