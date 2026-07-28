@@ -132,6 +132,8 @@ async function pointFetchApi(params: any) {
 }
 
 const pointFormConfig: any = computed(() => ({
+  layout: { cols: 2 },
+  dialogWidth: '700px',
   fields: [
     { type: 'input', label: '编号', prop: 'code', rules: [{ required: true, message: '请输入编号', trigger: 'blur' }] },
     { type: 'input', label: '名称', prop: 'name', rules: [{ required: true, message: '请输入名称', trigger: 'blur' }] },
@@ -186,6 +188,7 @@ const pointActionButtons: ActionButton[] = [
         :form-config="locationFormConfig"
         :tree-props="{ rowKey: 'id', children: 'children', defaultExpandAll: true }"
         :show-search="false"
+        table-size="small"
         @row-click="handleLocationRowClick"
       />
     </el-card>

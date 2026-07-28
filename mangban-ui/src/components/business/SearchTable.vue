@@ -1,7 +1,7 @@
 <template>
-  <div class="search-table">
+  <div class="search-table" :class="{ 'is-small': tableSize === 'small' }">
     <!-- 搜索栏 -->
-    <el-card v-if="showSearch" style="margin-bottom: 16px">
+    <el-card v-if="showSearch" class="search-card" style="margin-bottom: 16px">
       <el-form :inline="true" :model="query" :size="tableSize" @submit.prevent>
         <el-form-item v-for="field in searchFields" :key="field.prop" :label="field.label">
           <el-input
@@ -59,7 +59,7 @@
     </el-card>
 
     <!-- 表格卡片 -->
-    <el-card>
+    <el-card class="table-card">
       <div style="margin-bottom: 12px; display: flex; align-items: center; gap: 8px">
         <slot />
         <el-button
@@ -74,7 +74,8 @@
         </el-button>
       </div>
 
-      <el-table :data="list" v-loading="loading" border :size="tableSize" v-bind="treeTableAttrs" @row-click="(row: any, col: any, evt: Event) => emit('row-click', row, col, evt)">
+      <div class="table-wrapper">
+      <el-table :data="list" v-loading="loading" border :size="tableSize" height="100%" v-bind="treeTableAttrs" @row-click="(row: any, col: any, evt: Event) => emit('row-click', row, col, evt)">
         <el-table-column
           v-for="col in columns"
           :key="col.prop || col.label"
@@ -152,8 +153,9 @@
           </template>
         </el-table-column>
       </el-table>
+      </div>
 
-      <div v-if="showPagination && total > 0" style="margin-top: 16px; display: flex; justify-content: flex-end">
+      <div v-if="showPagination && total > 0" class="pagination-bar">
         <el-pagination
           v-model:current-page="query.page"
           v-model:page-size="query.size"
@@ -409,3 +411,73 @@ function handleDialogClose() {
 
 defineExpose({ fetchList, openFormDialog: handleCreate })
 </script>
+
+<style scoped>
+.search-table {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 紧凑模式 */
+.is-small {
+  font-size: 12px;
+}
+.is-small .el-form,
+.is-small .el-table,
+.is-small .el-pagination {
+  font-size: 12px;
+}
+
+/* 搜索栏 */
+.search-card {
+  flex-shrink: 0;
+}
+.search-card :deep(.el-card__body) {
+  padding-bottom: 0;
+}
+
+/* 表格卡片 - 占满剩余空间 */
+.table-card {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.table-card :deep(.el-card__body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* 工具栏 - 固定 */
+.toolbar {
+  flex-shrink: 0;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 表格数据区域 - 滚动 */
+.table-wrapper {
+  flex: 1;
+  overflow: hidden;
+}
+.table-wrapper :deep(.el-table) {
+  height: 100% !important;
+}
+.table-wrapper :deep(.el-table__body-wrapper) {
+  overflow-y: auto;
+}
+
+/* 分页栏 */
+.pagination-bar {
+  flex-shrink: 0;
+  margin-top: 16px;
+  display: flex;
+  justify-content: flex-end;
+}
+</style>

@@ -26,7 +26,7 @@ const searchFields: SearchField[] = [
   { type: 'select', label: '危险等级', prop: 'hazardLevel', placeholder: '选择等级', options: hazardLevelOptions },
   { type: 'select', label: '通盲状态', prop: 'status', placeholder: '选择状态', options: statusOptions },
   { type: 'select', label: '占用状态', prop: 'occupyStatus', placeholder: '占用状态', options: occupyStatusOptions },
-  { type: 'input', label: '装置名称', prop: 'plantName', placeholder: '输入装置' },
+
 ]
 
 const columns: TableColumn[] = [
@@ -62,6 +62,5 @@ async function fetchApi(params: any) {
     :search-fields="searchFields"
     :columns="columns"
     :fetch-api="fetchApi"
-    table-size="small"
-  />
+    />
 </template>

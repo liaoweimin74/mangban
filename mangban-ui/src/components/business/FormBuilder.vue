@@ -1,7 +1,7 @@
 <template>
-  <el-form ref="formRef" :model="localModel" :label-width="labelWidth || '80px'" :label-position="labelPosition">
+  <el-form ref="formRef" :model="localModel" :label-width="labelWidth || '80px'" :label-position="labelPosition" style="width: 100%">
     <!-- grid 布局 -->
-    <el-row v-if="typeof layout === 'object' && 'cols' in layout" :gutter="layout.gap || 16">
+    <el-row v-if="typeof layout === 'object' && 'cols' in layout" :gutter="layout.gap || 16" style="width: 100%">
       <template v-for="(field, index) in fields" :key="field.prop || index">
         <el-col :span="field.span || (24 / layout.cols)">
           <el-form-item :label="field.label" :prop="field.prop" :rules="field.rules">
@@ -16,7 +16,7 @@
     <template v-else>
       <template v-for="(field, index) in fields" :key="field.prop || index">
         <!-- double 布局：每行两个 -->
-        <el-row v-if="layout === 'double' && index % 2 === 0" :gutter="16">
+        <el-row v-if="layout === 'double' && index % 2 === 0" :gutter="16" style="width: 100%">
           <el-col :span="field.span || 12">
             <el-form-item :label="field.label" :prop="field.prop" :rules="field.rules">
               <slot v-if="field.type === 'slot'" :name="field.slotName" :value="localModel[field.prop]" :update="(v: any) => setFieldValue(field, v)" />
