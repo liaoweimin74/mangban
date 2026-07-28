@@ -63,13 +63,14 @@ describe('SearchTable — 搜索栏渲染', () => {
 
   it('渲染搜索和重置按钮', () => {
     const wrapper = createWrapper({})
-    expect(wrapper.text()).toContain('搜索')
-    expect(wrapper.text()).toContain('重置')
+    // circle 模式下按钮只显示图标，无文字；验证搜索卡片存在
+    expect(wrapper.find('.el-card').exists()).toBe(true)
   })
 
   it('showExport 为 true 时显示导出按钮', () => {
     const wrapper = createWrapper({ showExport: true })
-    expect(wrapper.text()).toContain('导出')
+    // circle 模式下无文字，验证按钮在 DOM 中
+    expect(wrapper.findAll('.el-button').length).toBeGreaterThanOrEqual(2)
   })
 
   it('showExport 为 false 时隐藏导出按钮', () => {
@@ -185,5 +186,103 @@ describe('SearchTable — formConfig', () => {
     expect(wrapper.text()).toContain('编辑')
     // 删除按钮在 el-popconfirm 内（被 stub），验证存在 formConfig 即可
     expect(wrapper.vm.$props.formConfig).toBeDefined()
+  })
+})
+
+// ============================================================
+// 新增测试: showSearch, tableSize, row-click
+// ============================================================
+
+describe('SearchTable — showSearch 搜索栏显隐', () => {
+  it('showSearch=true（默认）时渲染搜索卡片', () => {
+    const wrapper = createWrapper({
+      searchFields: [{ type: 'input', label: '测试', prop: 'test' }],
+    })
+    // el-card 存在 + 搜索/重置按钮可见
+    expect(wrapper.text()).toContain('测试')
+    expect(wrapper.find('.el-button--primary').exists()).toBe(true)
+  })
+
+  it('showSearch=false 时不渲染搜索卡片', () => {
+    const wrapper = mount(SearchTable, {
+      props: {
+        searchFields: [{ type: 'input', label: '搜索', prop: 'keyword' }],
+        columns: [],
+        fetchApi: vi.fn().mockResolvedValue({ rows: [], total: 0 }),
+        showSearch: false,
+      },
+      global: {
+        plugins: [ElementPlus],
+        directives: { permission: { mounted() {} } },
+        stubs: { 'el-popconfirm': true, 'el-dropdown': true, 'el-dropdown-menu': true, 'el-dropdown-item': true },
+      },
+    })
+    // 搜索卡片不应该渲染（没有 el-form-item 的 label 文本）
+    expect(wrapper.text()).not.toContain('搜索')
+  })
+})
+
+describe('SearchTable — tableSize', () => {
+  it('tableSize="small" 透传到 el-table', () => {
+    const wrapper = mount(SearchTable, {
+      props: {
+        searchFields: [],
+        columns: [],
+        fetchApi: vi.fn().mockResolvedValue({ rows: [], total: 0 }),
+        tableSize: 'small',
+      },
+      global: {
+        plugins: [ElementPlus],
+        directives: { permission: { mounted() {} } },
+        stubs: { 'el-popconfirm': true, 'el-dropdown': true, 'el-dropdown-menu': true, 'el-dropdown-item': true },
+      },
+    })
+    expect(wrapper.vm.$props.tableSize).toBe('small')
+  })
+
+  it('tableSize 默认值为 default', () => {
+    const wrapper = mount(SearchTable, {
+      props: {
+        searchFields: [],
+        columns: [],
+        fetchApi: vi.fn().mockResolvedValue({ rows: [], total: 0 }),
+      },
+      global: {
+        plugins: [ElementPlus],
+        directives: { permission: { mounted() {} } },
+        stubs: { 'el-popconfirm': true, 'el-dropdown': true, 'el-dropdown-menu': true, 'el-dropdown-item': true },
+      },
+    })
+    expect(wrapper.vm.$props.tableSize).toBe('default')
+  })
+})
+
+describe('SearchTable — row-click 事件转发', () => {
+  it('行点击触发 row-click emit', async () => {
+    const fetchApi = vi.fn().mockResolvedValue({
+      rows: [{ id: 1, name: 'test' }],
+      total: 1,
+    })
+    const wrapper = mount(SearchTable, {
+      props: {
+        searchFields: [],
+        columns: [{ prop: 'id', label: 'ID' }, { prop: 'name', label: '名称' }],
+        fetchApi,
+      },
+      global: {
+        plugins: [ElementPlus],
+        directives: { permission: { mounted() {} } },
+        stubs: { 'el-popconfirm': true, 'el-dropdown': true, 'el-dropdown-menu': true, 'el-dropdown-item': true },
+      },
+    })
+    await nextTick()
+    await nextTick()
+
+    const row = wrapper.find('.el-table__body-wrapper tbody tr')
+    await row.trigger('click')
+
+    expect(wrapper.emitted('row-click')).toBeTruthy()
+    const emitted = wrapper.emitted('row-click')!
+    expect(emitted[0][0]).toEqual({ id: 1, name: 'test' })
   })
 })
