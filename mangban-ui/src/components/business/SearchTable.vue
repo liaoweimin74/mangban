@@ -101,9 +101,10 @@
               <template v-for="btn in visibleButtons" :key="btn.label">
                 <el-popconfirm v-if="btn.confirm" :title="btn.confirm" @confirm="btn.onClick(row)">
                   <template #reference>
-                    <el-button
-                      size="small"
-                      :type="btn.type || 'text'"
+                    <el-button text
+                      size="small"                      
+                      :type="btn.type"
+                      :class="btn.class"
                       v-permission="btn.permission"
                     >
                       {{ btn.label }}
