@@ -297,8 +297,8 @@ async function fetchList() {
   loading.value = true
   try {
     const res = await props.fetchApi({ ...query })
-    list.value = res.rows
-    total.value = res.total
+    list.value = Array.isArray(res.rows) ? res.rows : []
+    total.value = Number(res.total) || 0
   } finally {
     loading.value = false
   }
