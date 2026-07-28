@@ -23,7 +23,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'system/user',
         name: 'UserManagement',
-        component: () => import('@/views/system/user/UserPageEx.vue'),
+        component: () => import('@/views/system/user/UserPage.vue'),
         meta: { title: '用户管理' }
       },
       {
@@ -47,7 +47,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'system/dict',
         name: 'DictManagement',
-        component: () => import('@/views/system/dict/DictPageEx.vue'),
+        component: () => import('@/views/system/dict/DictPage.vue'),
         meta: { title: '数据字典管理' }
       },
       {

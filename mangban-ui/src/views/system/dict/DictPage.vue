@@ -11,8 +11,8 @@ const selectedType = ref<DictTypeVO | null>(null)
 
 // ========== 字典类型 ==========
 const typeSearchFields: SearchField[] = [
-  { type: 'input', label: '字典名称', prop: 'dictName', placeholder: '输入名称' },
-  { type: 'input', label: '字典编码', prop: 'dictCode', placeholder: '输入编码' },
+  { type: 'input', label: '字典名称', prop: 'dictName', placeholder: '输入名称', style: 'width: 80px' },
+  { type: 'input', label: '字典编码', prop: 'dictCode', placeholder: '输入编码', style: 'width: 80px' },
 ]
 
 const typeColumns: TableColumn[] = [
@@ -33,12 +33,12 @@ const typeFormConfig: FormConfig<DictTypeVO> = {
     { type: 'input', label: '字典编码', prop: 'dictCode', rules: [{ required: true, message: '请输入字典编码', trigger: 'blur' }] },
     { type: 'input', label: '备注', prop: 'remark' },
   ],
-  createApi: createDictType,
-  updateApi: (id, data) => updateDictType(id as number, data),
-  deleteApi: deleteDictType,
-  getApi: async (id) => {
+  createApi: createDictType as any,
+  updateApi: (id, data) => updateDictType(id as number, data) as any,
+  deleteApi: deleteDictType as any,
+  getApi: async (id: any) => {
     const res = await getDictTypeList({ page: 1, size: 999 })
-    return res.data.rows.find((r: DictTypeVO) => r.id === id) || null
+    return res.data.rows.find((r: DictTypeVO) => r.id === id) ?? ({} as DictTypeVO)
   },
   dialogTitle: { create: '新增字典类型', edit: '编辑字典类型' },
 }
@@ -75,16 +75,16 @@ const dataFormConfig: FormConfig<DictDataVO> = {
   fields: [
     { type: 'input', label: '标签', prop: 'label', rules: [{ required: true, message: '请输入标签', trigger: 'blur' }] },
     { type: 'input', label: '值', prop: 'value', rules: [{ required: true, message: '请输入值', trigger: 'blur' }] },
-    { type: 'input-number', label: '排序', prop: 'sortOrder' },
+    { type: 'input', label: '排序', prop: 'sortOrder' } as any,
   ],
-  createApi: async (data: any) => createDictData({ ...data, dictCode: selectedType.value?.dictCode }),
-  updateApi: (id, data) => updateDictData(id as number, data),
-  deleteApi: deleteDictData,
-  getApi: async (id) => {
-    if (!selectedType.value) return null
+  createApi: async (data: any) => createDictData({ ...data, dictCode: selectedType.value?.dictCode }) as any,
+  updateApi: (id, data) => updateDictData(id as number, data) as any,
+  deleteApi: deleteDictData as any,
+  getApi: async (id: any) => {
+    if (!selectedType.value) return {} as any
     const res = await getDictDataList(selectedType.value.dictCode)
     const list = res.data as any[]
-    return list.find((d: any) => d.id === id) || null
+    return list.find((d: any) => d.id === id) ?? ({} as any)
   },
   dialogTitle: { create: '新增字典项', edit: '编辑字典项' },
 }
@@ -103,7 +103,7 @@ const dataActionButtons: ActionButton[] = [
 <template>
   <div style="display: flex; gap: 12px; height: calc(100vh - 140px)">
     <!-- 左侧：字典类型 -->
-    <el-card style="width: 400px; flex-shrink: 0">
+    <el-card style="width: 520px; flex-shrink: 0">
       <template #header><span style="font-weight: bold; font-size: 14px">字典类型</span></template>
       <SearchTable
         ref="typeTableRef"
@@ -112,6 +112,7 @@ const dataActionButtons: ActionButton[] = [
         :action-buttons="typeActionButtons"
         :fetch-api="typeFetchApi"
         :form-config="typeFormConfig"
+        table-size="small"
         @row-click="handleTypeRowClick"
       />
     </el-card>
@@ -126,6 +127,7 @@ const dataActionButtons: ActionButton[] = [
         :search-fields="dataSearchFields"
         :columns="dataColumns"
         :action-buttons="dataActionButtons"
+        table-size="small"
         :fetch-api="async (p: any) => {
           if (!selectedType) return { rows: [], total: 0 }
           const res = await getDictDataList(selectedType.dictCode)
