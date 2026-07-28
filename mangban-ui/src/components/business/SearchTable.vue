@@ -2,7 +2,7 @@
   <div class="search-table">
     <!-- 搜索栏 -->
     <el-card v-if="showSearch" style="margin-bottom: 16px">
-      <el-form :inline="true" :model="query" size="small" @submit.prevent>
+      <el-form :inline="true" :model="query" :size="tableSize" @submit.prevent>
         <el-form-item v-for="field in searchFields" :key="field.prop" :label="field.label">
           <el-input
             v-if="field.type === 'input'"
@@ -159,7 +159,7 @@
           :total="total"
           :page-sizes="pageSizes"
           layout="total, sizes, prev, pager, next, jumper"
-          small
+          :small="tableSize === 'small'"
           @size-change="fetchList()"
           @current-change="fetchList()"
         />
