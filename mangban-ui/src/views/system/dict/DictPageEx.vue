@@ -127,6 +127,7 @@ const dataActionButtons: ActionButton[] = [
         :search-fields="dataSearchFields"
         :columns="dataColumns"
         :action-buttons="dataActionButtons"
+        table-size="small"
         :fetch-api="async (p: any) => {
           if (!selectedType) return { rows: [], total: 0 }
           const res = await getDictDataList(selectedType.dictCode)
