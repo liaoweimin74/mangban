@@ -72,7 +72,7 @@
         </el-button>
       </div>
 
-      <el-table :data="list" v-loading="loading" border :size="tableSize" @row-click="(row, col, evt) => emit('row-click', row, col, evt)">
+      <el-table :data="list" v-loading="loading" border :size="tableSize" @row-click="(row: any, col: any, evt: Event) => emit('row-click', row, col, evt)">
         <el-table-column
           v-for="col in columns"
           :key="col.prop || col.label"
