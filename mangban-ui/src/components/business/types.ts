@@ -128,6 +128,18 @@ export interface FormConfig<T = any> {
 
 // --- SearchTable props ---
 
+// --- 表格搜索配置 ---
+
+/** 树形表格配置 */
+export interface TreeTableProps {
+  /** el-table 的 row-key */
+  rowKey: string
+  /** 子节点字段名 */
+  children: string
+  /** 是否默认展开所有节点 */
+  defaultExpandAll?: boolean
+}
+
 export interface SearchTableProps<T = any> {
   searchFields: SearchField[]
   columns: TableColumn[]
@@ -145,6 +157,8 @@ export interface SearchTableProps<T = any> {
   showSearch?: boolean
   /** el-table 尺寸，默认 'default' */
   tableSize?: 'small' | 'default' | 'large'
+  /** 树形表格配置，存在时启用树形渲染并隐藏分页 */
+  treeProps?: TreeTableProps
 }
 
 // --- ReferencePicker props ---

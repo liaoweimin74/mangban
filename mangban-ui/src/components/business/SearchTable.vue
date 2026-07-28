@@ -74,7 +74,7 @@
         </el-button>
       </div>
 
-      <el-table :data="list" v-loading="loading" border :size="tableSize" @row-click="(row: any, col: any, evt: Event) => emit('row-click', row, col, evt)">
+      <el-table :data="list" v-loading="loading" border :size="tableSize" v-bind="treeTableAttrs" @row-click="(row: any, col: any, evt: Event) => emit('row-click', row, col, evt)">
         <el-table-column
           v-for="col in columns"
           :key="col.prop || col.label"
@@ -153,7 +153,7 @@
         </el-table-column>
       </el-table>
 
-      <div v-if="total > 0" style="margin-top: 16px; display: flex; justify-content: flex-end">
+      <div v-if="showPagination && total > 0" style="margin-top: 16px; display: flex; justify-content: flex-end">
         <el-pagination
           v-model:current-page="query.page"
           v-model:page-size="query.size"
@@ -207,6 +207,19 @@ const props = withDefaults(defineProps<SearchTableProps>(), {
   showSearch: true,
   tableSize: 'default',
 })
+
+/** 树形表格属性：透传给 el-table */
+const treeTableAttrs = computed(() => {
+  if (!props.treeProps) return {}
+  return {
+    'row-key': props.treeProps.rowKey,
+    'tree-props': { children: props.treeProps.children },
+    'default-expand-all': props.treeProps.defaultExpandAll ?? true,
+  }
+})
+
+/** 树形模式下隐藏分页 */
+const showPagination = computed(() => !props.treeProps)
 
 const emit = defineEmits<{
   search: [params: QueryParams]

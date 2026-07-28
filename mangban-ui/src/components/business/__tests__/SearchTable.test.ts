@@ -286,3 +286,32 @@ describe('SearchTable — row-click 事件转发', () => {
     expect(emitted[0][0]).toEqual({ id: 1, name: 'test' })
   })
 })
+
+// ----- 树形表格测试 -----
+
+describe('SearchTable — tree mode', () => {
+  it('有 treeProps 时隐藏分页', async () => {
+    const wrapper = createWrapper({
+      treeProps: { rowKey: 'id', children: 'children', defaultExpandAll: true },
+    })
+    await nextTick()
+    expect(wrapper.find('.el-pagination').exists()).toBe(false)
+  })
+
+  it('无 treeProps 时显示分页', async () => {
+    const wrapper = createWrapper({
+      fetchApi: vi.fn().mockResolvedValue({ rows: [], total: 10 }),
+    })
+    await nextTick()
+    expect(wrapper.find('.el-pagination').exists()).toBe(true)
+  })
+
+  it('treeProps 透传 row-key 到 el-table', async () => {
+    const wrapper = createWrapper({
+      treeProps: { rowKey: 'id', children: 'children', defaultExpandAll: true },
+    })
+    await nextTick()
+    const table = wrapper.find('.el-table')
+    expect(table.exists()).toBe(true)
+  })
+})
