@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { SearchTable } from '@/components/business'
 import type { SearchField, TableColumn, ActionButton, FormConfig } from '@/components/business/types'
 import { getOrgTree, createOrg, updateOrg, deleteOrg } from '@/api/org'
@@ -41,7 +41,7 @@ const actionButtons: ActionButton[] = [
 ]
 
 // ---------- 表单配置（字段映射 name→orgName, code→orgCode） ----------
-const formConfig: FormConfig<TreeNode> = {
+const formConfig = computed<FormConfig<TreeNode>>(() => ({
   fields: [
     {
       type: 'tree-select', label: '上级组织', prop: 'parentId',
@@ -50,7 +50,7 @@ const formConfig: FormConfig<TreeNode> = {
     },
     { type: 'input', label: '组织名称', prop: 'name', rules: [{ required: true, message: '请输入组织名称', trigger: 'blur' }] },
     { type: 'input', label: '组织编码', prop: 'code', rules: [{ required: true, message: '请输入组织编码', trigger: 'blur' }] },
-    { type: 'input-number', label: '排序', prop: 'sortOrder' },
+    { type: 'input', label: '排序', prop: 'sortOrder' },
   ],
   createApi: (data: any) => createOrg({ ...data, orgName: data.name, orgCode: data.code }),
   updateApi: (id, data: any) => updateOrg(id as number, { ...data, orgName: data.name, orgCode: data.code }),
@@ -60,7 +60,7 @@ const formConfig: FormConfig<TreeNode> = {
     return findNode(res.data, id)
   },
   dialogTitle: { create: '新增组织', edit: '编辑组织' },
-}
+}))
 
 function findNode(tree: TreeNode[], id: number): TreeNode | null {
   for (const node of tree) {
