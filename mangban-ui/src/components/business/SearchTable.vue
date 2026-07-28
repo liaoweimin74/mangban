@@ -1,7 +1,7 @@
 <template>
   <div class="search-table">
     <!-- 搜索栏 -->
-    <el-card style="margin-bottom: 16px">
+    <el-card v-if="showSearch" style="margin-bottom: 16px">
       <el-form :inline="true" :model="query" @submit.prevent>
         <el-form-item v-for="field in searchFields" :key="field.prop" :label="field.label">
           <el-input
@@ -49,9 +49,9 @@
         </el-form-item>
         <el-form-item>
           <div style="display: flex; gap: 8px; margin-left: auto">
-            <el-button type="primary" :icon="Search" @click="handleSearch">搜索</el-button>
-            <el-button :icon="Refresh" @click="handleReset">重置</el-button>
-            <el-button v-if="showExport" :icon="Download" :loading="exportLoading" @click="handleExport">导出</el-button>
+            <el-button type="primary" :icon="Search" circle @click="handleSearch" />
+            <el-button :icon="Refresh" circle @click="handleReset" />
+            <el-button v-if="showExport" :icon="Download" :loading="exportLoading" circle @click="handleExport" />
           </div>
         </el-form-item>
       </el-form>
@@ -72,7 +72,7 @@
         </el-button>
       </div>
 
-      <el-table :data="list" v-loading="loading" border>
+      <el-table :data="list" v-loading="loading" border :size="tableSize" @row-click="(row, col, evt) => emit('row-click', row, col, evt)">
         <el-table-column
           v-for="col in columns"
           :key="col.prop || col.label"
@@ -201,12 +201,15 @@ const props = withDefaults(defineProps<SearchTableProps>(), {
   showExport: false,
   exportLoading: false,
   maxVisibleButtons: 3,
+  showSearch: true,
+  tableSize: 'default',
 })
 
 const emit = defineEmits<{
   search: [params: QueryParams]
   reset: []
   export: [params: QueryParams]
+  'row-click': [row: any, column: any, event: Event]
 }>()
 
 const loading = ref(false)

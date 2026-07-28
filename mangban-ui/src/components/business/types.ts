@@ -141,6 +141,10 @@ export interface SearchTableProps<T = any> {
   exportLoading?: boolean
   maxVisibleButtons?: number
   formConfig?: FormConfig<T>
+  /** 是否显示搜索栏，默认 true */
+  showSearch?: boolean
+  /** el-table 尺寸，默认 'default' */
+  tableSize?: 'small' | 'default' | 'large'
 }
 
 // --- ReferencePicker props ---
