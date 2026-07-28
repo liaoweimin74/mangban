@@ -57,22 +57,10 @@ const routes: RouteRecordRaw[] = [
         meta: { title: '个人中心' }
       },
       {
-        path: 'process/locations',
-        name: 'LocationManagement',
-        component: () => import('@/views/process/LocationPage.vue'),
-        meta: { title: '装置层级管理' }
-      },
-      {
         path: 'process/isolation-points',
         name: 'IsolationPointManagement',
-        component: () => import('@/views/process/IsolationPointPage.vue'),
+        component: () => import('@/views/process/IsolationPointManagePage.vue'),
         meta: { title: '隔离点台账' }
-      },
-      {
-        path: 'process/isolation-points/status',
-        name: 'IsolationPointStatus',
-        component: () => import('@/views/process/IsolationPointStatusPage.vue'),
-        meta: { title: '状态台账总览' }
       },
       {
         path: '404',

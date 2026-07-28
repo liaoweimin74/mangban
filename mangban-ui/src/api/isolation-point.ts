@@ -23,10 +23,10 @@ export function deleteIsolationPoint(id: number) {
   return http.delete<any, R<null>>(`/isolation-points/${id}`)
 }
 
-export function updateIsolationPointStatus(id: number, status: string) {
-  return http.put<any, R<IsolationPointVO>>(`/isolation-points/${id}/status`, { status })
+export function updateIsolationPointStatus(id: number, data: { status: string }) {
+  return http.put<any, R<IsolationPointVO>>(`/isolation-points/${id}/status`, data)
 }
 
-export function updateIsolationPointOccupy(id: number, occupyStatus: string) {
-  return http.put<any, R<IsolationPointVO>>(`/isolation-points/${id}/occupy`, { occupyStatus })
+export function updateIsolationPointOccupy(id: number, data: { occupyStatus: string }) {
+  return http.put<any, R<IsolationPointVO>>(`/isolation-points/${id}/occupy`, data)
 }
