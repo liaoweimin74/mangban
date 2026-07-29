@@ -1,9 +1,0 @@
-/mnt/d/aicode/mangban/.worktrees/isolation-point-management/mangban/mangban-common/src/main/java/com/mangban/common/config/CorsConfig.java
-/mnt/d/aicode/mangban/.worktrees/isolation-point-management/mangban/mangban-common/src/main/java/com/mangban/common/config/JacksonConfig.java
-/mnt/d/aicode/mangban/.worktrees/isolation-point-management/mangban/mangban-common/src/main/java/com/mangban/common/config/RedisConfig.java
-/mnt/d/aicode/mangban/.worktrees/isolation-point-management/mangban/mangban-common/src/main/java/com/mangban/common/constant/GlobalConstant.java
-/mnt/d/aicode/mangban/.worktrees/isolation-point-management/mangban/mangban-common/src/main/java/com/mangban/common/domain/PageResult.java
-/mnt/d/aicode/mangban/.worktrees/isolation-point-management/mangban/mangban-common/src/main/java/com/mangban/common/domain/R.java
-/mnt/d/aicode/mangban/.worktrees/isolation-point-management/mangban/mangban-common/src/main/java/com/mangban/common/exception/BusinessException.java
-/mnt/d/aicode/mangban/.worktrees/isolation-point-management/mangban/mangban-common/src/main/java/com/mangban/common/exception/GlobalExceptionHandler.java
-/mnt/d/aicode/mangban/.worktrees/isolation-point-management/mangban/mangban-common/src/main/java/com/mangban/common/util/SpringUtils.java
