@@ -1,4 +1,4 @@
-# ↑ Manual gitignore entries go ABOVE this line (outside auto-generated block) ↑
+# ↑ Manual gitignore entries go ABOVE this line (outside auto-generated block) 
 
 # Node / TypeScript
 node_modules/
@@ -37,6 +37,8 @@ target/
 
 .opencode/*
 !.opencode/opencode.json
+.playwright-mcp/*
+.task-briefs/*
 
 # Skills lock — global Superpowers version pinning, not project code
 
