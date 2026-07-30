@@ -1,5 +1,6 @@
 package com.mangban.system.domain.entity;
 
+import com.mangban.common.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.util.List;
 

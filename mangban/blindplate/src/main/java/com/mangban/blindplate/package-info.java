@@ -1,5 +1,5 @@
 @ApplicationModule(displayName = "核心业务模块",
-    allowedDependencies = {"common", "framework", "system"})
+    allowedDependencies = {"common", "framework"})
 package com.mangban.blindplate;
 
 import org.springframework.modulith.ApplicationModule;

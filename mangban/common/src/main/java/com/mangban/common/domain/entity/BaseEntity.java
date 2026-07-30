@@ -1,4 +1,4 @@
-package com.mangban.system.domain.entity;
+package com.mangban.common.domain.entity;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;

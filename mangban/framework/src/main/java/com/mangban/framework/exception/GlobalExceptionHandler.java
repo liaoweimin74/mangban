@@ -1,6 +1,7 @@
-package com.mangban.common.exception;
+package com.mangban.framework.exception;
 
 import com.mangban.common.domain.R;
+import com.mangban.common.exception.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

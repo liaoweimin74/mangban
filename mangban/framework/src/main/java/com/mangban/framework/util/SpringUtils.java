@@ -1,4 +1,4 @@
-package com.mangban.common.util;
+package com.mangban.framework.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

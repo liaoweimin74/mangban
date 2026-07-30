@@ -1,6 +1,6 @@
 package com.mangban.blindplate.domain.entity;
 
-import com.mangban.system.domain.entity.BaseEntity;
+import com.mangban.common.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
