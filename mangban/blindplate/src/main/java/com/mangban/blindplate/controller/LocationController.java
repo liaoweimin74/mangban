@@ -1,10 +1,10 @@
-package com.mangban.system.controller;
+package com.mangban.blindplate.controller;
 
 import com.mangban.common.domain.R;
-import com.mangban.system.domain.dto.LocationCreateRequest;
-import com.mangban.system.domain.dto.LocationUpdateRequest;
-import com.mangban.system.domain.vo.LocationTreeNode;
-import com.mangban.system.service.LocationService;
+import com.mangban.blindplate.domain.dto.LocationCreateRequest;
+import com.mangban.blindplate.domain.dto.LocationUpdateRequest;
+import com.mangban.blindplate.domain.vo.LocationTreeNode;
+import com.mangban.blindplate.service.LocationService;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 

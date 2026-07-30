@@ -1,8 +1,8 @@
-package com.mangban.system.service;
+package com.mangban.blindplate.service;
 
-import com.mangban.system.domain.dto.LocationCreateRequest;
-import com.mangban.system.domain.dto.LocationUpdateRequest;
-import com.mangban.system.domain.vo.LocationTreeNode;
+import com.mangban.blindplate.domain.dto.LocationCreateRequest;
+import com.mangban.blindplate.domain.dto.LocationUpdateRequest;
+import com.mangban.blindplate.domain.vo.LocationTreeNode;
 
 import java.util.List;
 

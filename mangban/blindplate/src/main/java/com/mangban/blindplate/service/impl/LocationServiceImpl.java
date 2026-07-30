@@ -1,13 +1,13 @@
-package com.mangban.system.service.impl;
+package com.mangban.blindplate.service.impl;
 
 import com.mangban.common.constant.GlobalConstant;
 import com.mangban.common.exception.BusinessException;
-import com.mangban.system.domain.dto.LocationCreateRequest;
-import com.mangban.system.domain.dto.LocationUpdateRequest;
-import com.mangban.system.domain.entity.SysLocation;
-import com.mangban.system.domain.vo.LocationTreeNode;
-import com.mangban.system.repository.SysLocationRepository;
-import com.mangban.system.service.LocationService;
+import com.mangban.blindplate.domain.dto.LocationCreateRequest;
+import com.mangban.blindplate.domain.dto.LocationUpdateRequest;
+import com.mangban.blindplate.domain.entity.SysLocation;
+import com.mangban.blindplate.domain.vo.LocationTreeNode;
+import com.mangban.blindplate.repository.SysLocationRepository;
+import com.mangban.blindplate.service.LocationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;

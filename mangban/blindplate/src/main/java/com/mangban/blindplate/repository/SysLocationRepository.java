@@ -1,6 +1,6 @@
-package com.mangban.system.repository;
+package com.mangban.blindplate.repository;
 
-import com.mangban.system.domain.entity.SysLocation;
+import com.mangban.blindplate.domain.entity.SysLocation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 

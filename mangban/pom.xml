@@ -45,6 +45,13 @@
                 <version>${jjwt.version}</version>
                 <scope>runtime</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.modulith</groupId>
+                <artifactId>spring-modulith-bom</artifactId>
+                <version>1.4.0</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
         </dependencies>
     </dependencyManagement>
     <build>

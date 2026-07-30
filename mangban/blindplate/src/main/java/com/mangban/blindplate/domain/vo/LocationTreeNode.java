@@ -1,4 +1,4 @@
-package com.mangban.system.domain.vo;
+package com.mangban.blindplate.domain.vo;
 
 import java.util.List;
 
