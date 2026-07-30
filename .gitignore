@@ -19,7 +19,10 @@ target/
 *.swp
 *.swo
 
-# <!-- openspec-superpowers-opencode_gitignore -->
+# Runtime files
+backend-run.log
+backend.pid
+*.pid
 
 # Worktree isolation
 
