@@ -1,3 +1,5 @@
+import type { Component } from 'vue'
+
 // ============================================================
 // 公共业务组件类型定义
 // ============================================================
@@ -42,7 +44,8 @@ export interface ActionButton {
   label: string
   type?: 'primary' | 'success' | 'warning' | 'danger' | 'info' | 'text'
   size?: 'small' | 'default' | 'large'
-  icon?: string
+  /** Element Plus 图标组件。配置后渲染为圆形图标按钮，hover 显示 label */
+  icon?: Component
   permission?: string
   confirm?: string
   onClick: (row: any) => void
@@ -73,6 +76,7 @@ export interface FormField {
     | 'checkbox'
     | 'textarea'
     | 'slot'
+    | 'lookup'
   label: string
   prop: string
   placeholder?: string
@@ -86,6 +90,7 @@ export interface FormField {
   span?: number
   slotName?: string
   props?: Record<string, any>
+  visible?: (formData: Record<string, any>) => boolean
   onChange?: (
     newVal: any,
     oldVal: any,
@@ -107,6 +112,8 @@ export interface FormBuilderProps {
 
 export interface FormConfig<T = any> {
   fields: FormField[]
+  /** 新增表单的初始值，handleCreate 时与传入 initialValues 合并 */
+  initialValues?: Record<string, any>
   createApi?: (data: any) => Promise<any>
   updateApi?: (id: number | string, data: any) => Promise<any>
   deleteApi?: (id: number | string) => Promise<any>
@@ -162,6 +169,43 @@ export interface SearchTableProps<T = any> {
 }
 
 // --- ReferencePicker props ---
+
+// --- LookupPicker props ---
+
+export interface LookupPickerProps {
+  /** v-model 绑定选中行数据 */
+  modelValue: Record<string, any> | null | Record<string, any>[]
+
+  /** 弹窗表格列定义 */
+  columns: TableColumn[]
+
+  /** 数据获取函数 */
+  fetchApi: (
+    params: QueryParams & { keyword?: string },
+  ) => Promise<{ rows: any[]; total: number }>
+
+  /** 字段映射：选中行的 sourceField → 表单的 targetField */
+  returnFields?: Record<string, string>
+
+  /** 输入框显示字段，默认取 columns 第一个非 selection 列的 prop */
+  displayField?: string
+
+  /** 输入框占位符 */
+  placeholder?: string
+  searchPlaceholder?: string
+
+  /** 是否显示弹窗搜索框，默认 true */
+  showSearch?: boolean
+
+  /** 选择模式：single（默认）| multiple */
+  mode?: 'single' | 'multiple'
+
+  disabled?: boolean
+  clearable?: boolean
+
+  /** 弹窗标题 */
+  dialogTitle?: string
+}
 
 export interface ReferencePickerProps<T = any> {
   modelValue: any | any[]

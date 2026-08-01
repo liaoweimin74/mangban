@@ -1,55 +1,28 @@
 <template>
   <el-form ref="formRef" :model="localModel" :label-width="labelWidth || '80px'" :label-position="labelPosition" style="width: 100%">
-    <!-- grid 布局 -->
-    <el-row v-if="typeof layout === 'object' && 'cols' in layout" :gutter="layout.gap || 16" style="width: 100%">
-      <template v-for="(field, index) in fields" :key="field.prop || index">
-        <el-col :span="field.span || (24 / layout.cols)">
-          <el-form-item :label="field.label" :prop="field.prop" :rules="field.rules">
-            <slot v-if="field.type === 'slot'" :name="field.slotName" :value="localModel[field.prop]" :update="(v: any) => setFieldValue(field, v)" />
-            <render-field v-else :field="field" :model-value="localModel[field.prop]" @update:model-value="(v: any) => setModelField(field, v)" @input-change="handleChange(field, localModel[field.prop])" />
-          </el-form-item>
-        </el-col>
-      </template>
-    </el-row>
-
-    <!-- single/double 布局 -->
-    <template v-else>
-      <template v-for="(field, index) in fields" :key="field.prop || index">
-        <!-- double 布局：每行两个 -->
-        <el-row v-if="layout === 'double' && index % 2 === 0" :gutter="16" style="width: 100%">
-          <el-col :span="field.span || 12">
-            <el-form-item :label="field.label" :prop="field.prop" :rules="field.rules">
-              <slot v-if="field.type === 'slot'" :name="field.slotName" :value="localModel[field.prop]" :update="(v: any) => setFieldValue(field, v)" />
-              <render-field v-else :field="field" :model-value="localModel[field.prop]" @update:model-value="(v: any) => setModelField(field, v)" @input-change="handleChange(field, localModel[field.prop])" />
-            </el-form-item>
-          </el-col>
-          <el-col v-if="fields[index + 1]" :span="fields[index + 1].span || 12">
-            <el-form-item :label="fields[index + 1].label" :prop="fields[index + 1].prop" :rules="fields[index + 1].rules">
-              <slot v-if="fields[index + 1].type === 'slot'" :name="fields[index + 1].slotName" :value="localModel[fields[index + 1].prop]" :update="(v: any) => setFieldValue(fields[index + 1], v)" />
-              <render-field v-else :field="fields[index + 1]" :model-value="localModel[fields[index + 1].prop]" @update:model-value="(v: any) => setModelField(fields[index + 1], v)" @input-change="handleChange(fields[index + 1], localModel[fields[index + 1].prop])" />
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <!-- single 布局：每行一个 -->
-        <el-form-item v-else-if="layout === 'single' || (layout === 'double' && fields.length % 2 !== 0 && index === fields.length - 1)" :label="field.label" :prop="field.prop" :rules="field.rules">
+    <el-row v-for="(row, ri) in layoutRows" :key="ri" :gutter="resolvedLayout.gap" style="width: 100%">
+      <el-col v-for="field in row.fields" :key="field.prop || field.label" :span="field.span ?? (24 / resolvedLayout.cols)">
+        <el-form-item :label="field.label" :prop="field.prop" :rules="field.rules">
           <slot v-if="field.type === 'slot'" :name="field.slotName" :value="localModel[field.prop]" :update="(v: any) => setFieldValue(field, v)" />
-          <render-field v-else :field="field" :model-value="localModel[field.prop]" @update:model-value="(v: any) => setModelField(field, v)" @input-change="handleChange(field, localModel[field.prop])" />
+          <render-field v-else :field="field" :model-value="localModel[field.prop]" :local-model="localModel" @update:model-value="( v: any) => setModelField(field, v)" @input-change="handleChange(field, localModel[field.prop])" />
         </el-form-item>
-      </template>
-    </template>
+      </el-col>
+    </el-row>
   </el-form>
 </template>
 
 <script setup lang="ts">
-import { reactive, watch, ref, defineComponent, h } from 'vue'
+import { reactive, watch, ref, computed, defineComponent, h } from 'vue'
 import { ElInput, ElSelect, ElOption, ElTreeSelect, ElSwitch, ElDatePicker, ElRadioGroup, ElRadio, ElCheckboxGroup, ElCheckbox } from 'element-plus'
 import type { FormField, FormBuilderProps } from './types'
+import LookupPicker from './LookupPicker.vue'
 
 // --- 内联字段渲染组件 ---
 const RenderField = defineComponent({
   props: {
     field: { type: Object as () => FormField, required: true },
     modelValue: { required: true },
+    localModel: { type: Object as () => Record<string, any>, required: true },
   },
   emits: ['update:modelValue', 'inputChange'],
   setup(props, { emit }) {
@@ -107,6 +80,35 @@ const RenderField = defineComponent({
                 h(ElCheckbox, { key: String(opt.value), value: opt.value }, () => opt.label),
               ),
           )
+        case 'lookup':
+          return h(LookupPicker, {
+            modelValue: v,
+            'onUpdate:modelValue': (val: Record<string, any> | null | Record<string, any>[]) => {
+              onInput(val)
+              // 批量更新 returnFields 目标字段
+              if (f.props?.returnFields && val) {
+                if (Array.isArray(val) && val.length > 0) {
+                  for (const [sourceField, targetField] of Object.entries(f.props.returnFields)) {
+                    props.localModel[targetField] = val[0][sourceField]
+                  }
+                } else if (!Array.isArray(val)) {
+                  for (const [sourceField, targetField] of Object.entries(f.props.returnFields)) {
+                    props.localModel[targetField] = val[sourceField]
+                  }
+                }
+              }
+              // 清空时清理目标字段
+              if (f.props?.returnFields) {
+                const isEmpty = !val || (Array.isArray(val) && val.length === 0)
+                if (isEmpty) {
+                  for (const targetField of Object.values(f.props.returnFields)) {
+                    props.localModel[targetField] = null
+                  }
+                }
+              }
+            },
+            ...f.props,
+          })
         default:
           return null
       }
@@ -117,6 +119,39 @@ const RenderField = defineComponent({
 const props = withDefaults(defineProps<FormBuilderProps>(), {
   layout: 'single',
   labelWidth: '80px',
+})
+
+const resolvedLayout = computed(() => {
+  const l = props.layout
+  if (typeof l === 'object' && l !== null && 'cols' in l) {
+    return { cols: l.cols, gap: l.gap ?? 16 }
+  }
+  if (l === 'single') return { cols: 1, gap: 0 }
+  if (l === 'double') return { cols: 2, gap: 16 }
+  return { cols: 1, gap: 0 }
+})
+
+const layoutRows = computed(() => {
+  const cols = resolvedLayout.value.cols
+  const defaultSpan = 24 / cols
+  const rows: { fields: FormField[] }[] = []
+  let currentRow: FormField[] = []
+  let acc = 0
+  for (const field of props.fields) {
+    // 跳过不可见字段
+    if (field.visible && !field.visible({ ...localModel })) continue
+    const span = field.span ?? defaultSpan
+    if (acc > 0 && acc + span > 24) {
+      rows.push({ fields: currentRow })
+      currentRow = [field]
+      acc = span
+    } else {
+      currentRow.push(field)
+      acc += span
+    }
+  }
+  if (currentRow.length) rows.push({ fields: currentRow })
+  return rows
 })
 
 const emit = defineEmits<{
