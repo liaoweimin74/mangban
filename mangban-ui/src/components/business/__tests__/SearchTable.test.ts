@@ -4,7 +4,9 @@
 import { describe, it, expect, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import { nextTick } from 'vue'
+import type { Component } from 'vue'
 import ElementPlus from 'element-plus'
+import { Edit, Delete, Switch } from '@element-plus/icons-vue'
 import SearchTable from '../SearchTable.vue'
 import type { SearchField, TableColumn, ActionButton } from '../types'
 
@@ -183,9 +185,94 @@ describe('SearchTable — formConfig', () => {
     await nextTick()
     await nextTick()
     expect(wrapper.text()).toContain('新增')
-    expect(wrapper.text()).toContain('编辑')
+    // formConfig 模式下默认编辑/删除按钮已图标化，验证 circle 按钮存在
+    expect(wrapper.find('.el-table .el-button.is-circle').exists()).toBe(true)
     // 删除按钮在 el-popconfirm 内（被 stub），验证存在 formConfig 即可
     expect(wrapper.vm.$props.formConfig).toBeDefined()
+  })
+})
+
+describe('SearchTable - 图标按钮', () => {
+  it('icon 按钮渲染为 circle button，不显示 label 文字', async () => {
+    const fetchApi = vi.fn().mockResolvedValue({
+      rows: [{ id: 1, name: 'test' }],
+      total: 1,
+    })
+    const wrapper = createWrapper({
+      columns: [{ prop: 'name', label: '名称' }],
+      actionButtons: [
+        { label: '编辑', icon: Edit as Component, onClick: () => {} },
+      ],
+      fetchApi,
+    })
+    await nextTick()
+    await nextTick()
+    // 图标按钮渲染为 circle，label 文字不出现在按钮文本中
+    const btn = wrapper.find('.el-table .el-button.is-circle')
+    expect(btn.exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('编辑')
+  })
+
+  it('无 icon 的按钮仍渲染为文本按钮', async () => {
+    const fetchApi = vi.fn().mockResolvedValue({
+      rows: [{ id: 1, name: 'test' }],
+      total: 1,
+    })
+    const wrapper = createWrapper({
+      columns: [{ prop: 'name', label: '名称' }],
+      actionButtons: [
+        { label: '重置密码', onClick: () => {} },
+      ],
+      fetchApi,
+    })
+    await nextTick()
+    await nextTick()
+    // 操作列中不应有 circle 按钮（搜索栏的 circle 按钮不算）
+    expect(wrapper.find('.el-table .el-button.is-circle').exists()).toBe(false)
+    expect(wrapper.text()).toContain('重置密码')
+  })
+
+  it('图标按钮和文本按钮可混用', async () => {
+    const fetchApi = vi.fn().mockResolvedValue({
+      rows: [{ id: 1, name: 'test' }],
+      total: 1,
+    })
+    const wrapper = createWrapper({
+      columns: [{ prop: 'name', label: '名称' }],
+      actionButtons: [
+        { label: '编辑', icon: Edit as Component, onClick: () => {} },
+        { label: '重置密码', onClick: () => {} },
+      ],
+      fetchApi,
+    })
+    await nextTick()
+    await nextTick()
+    expect(wrapper.find('.el-table .el-button.is-circle').exists()).toBe(true)
+    expect(wrapper.text()).toContain('重置密码')
+    expect(wrapper.text()).not.toContain('编辑')
+  })
+
+  it('formConfig 模式下默认编辑/删除按钮有 icon', async () => {
+    const fetchApi = vi.fn().mockResolvedValue({
+      rows: [{ id: 1, name: 'test' }],
+      total: 1,
+    })
+    const wrapper = createWrapper({
+      columns: [{ prop: 'name', label: '名称' }],
+      formConfig: {
+        fields: [{ type: 'input', label: '名称', prop: 'name' }],
+        createApi: vi.fn(),
+        updateApi: vi.fn(),
+        deleteApi: vi.fn(),
+      },
+      fetchApi,
+    })
+    await nextTick()
+    await nextTick()
+    // formConfig 默认按钮应为 circle 图标按钮
+    expect(wrapper.find('.el-table .el-button.is-circle').exists()).toBe(true)
+    // label 不直接显示在按钮文本中
+    expect(wrapper.text()).not.toContain('编辑')
   })
 })
 

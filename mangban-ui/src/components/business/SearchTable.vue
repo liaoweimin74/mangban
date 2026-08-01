@@ -100,20 +100,36 @@
           fixed="right"
         >
           <template #default="{ row }">
-            <div style="display: inline-flex; align-items: center; gap: 4px; white-space: nowrap">
+            <div style="display: inline-flex; align-items: center; gap: 0; white-space: nowrap">
               <template v-for="btn in visibleButtons" :key="btn.label">
-                <el-popconfirm v-if="btn.confirm" :title="btn.confirm" @confirm="btn.onClick(row)">
+                <!-- 图标 + confirm -->
+                <el-popconfirm v-if="btn.icon && btn.confirm" :title="btn.confirm" @confirm="btn.onClick(row)">
+                  <template #reference>
+                    <el-tooltip :content="btn.label" placement="top" :show-after="200">
+                      <el-button :icon="btn.icon" circle size="small" :type="btn.type" v-permission="btn.permission" />
+                    </el-tooltip>
+                  </template>
+                </el-popconfirm>
+
+                <!-- 图标无 confirm -->
+                <el-tooltip v-else-if="btn.icon" :content="btn.label" placement="top" :show-after="200">
+                  <el-button :icon="btn.icon" circle size="small" :type="btn.type" v-permission="btn.permission" @click="btn.onClick(row)" />
+                </el-tooltip>
+
+                <!-- 文本 + confirm (当前逻辑不变) -->
+                <el-popconfirm v-else-if="btn.confirm" :title="btn.confirm" @confirm="btn.onClick(row)">
                   <template #reference>
                     <el-button text
-                      size="small"                      
+                      size="small"
                       :type="btn.type"
-                      :class="btn.class"
                       v-permission="btn.permission"
                     >
                       {{ btn.label }}
                     </el-button>
                   </template>
                 </el-popconfirm>
+
+                <!-- 纯文本 (当前逻辑不变) -->
                 <el-button
                   v-else
                   size="small"
@@ -127,10 +143,7 @@
 
               <el-dropdown v-if="dropdownButtons.length" trigger="click">
                 <el-button size="small" text>
-                  <div style="display: flex; align-items: center; gap: 2px">
-                    <span>更多</span>
-                    <el-icon><ArrowDown /></el-icon>
-                  </div>
+                  <el-icon :size="16"><CaretBottom /></el-icon>
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -195,7 +208,7 @@
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, computed } from 'vue'
-import { Search, Refresh, Download, Plus, ArrowDown } from '@element-plus/icons-vue'
+import { Search, Refresh, Download, Plus, Edit, Delete, CaretBottom } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import type { SearchTableProps, ActionButton, QueryParams } from './types'
 import FormBuilder from './FormBuilder.vue'
@@ -248,11 +261,22 @@ const formRef = ref()
 
 // 操作列宽度
 const actionColumnWidth = computed(() => {
-  const total = resolvedActionButtons.value.length
-  const visible = Math.min(total, props.maxVisibleButtons)
-  const hasMore = total > props.maxVisibleButtons
-  // 每按钮约 70px + 更多约 80px
-  return (visible * 70 + (hasMore ? 80 : 0) + 20) + 'px'
+  const buttons = visibleButtons.value
+  const hasMore = resolvedActionButtons.value.length > props.maxVisibleButtons
+
+  let width = 0
+  for (const btn of buttons) {
+    if (btn.icon) {
+      width += 36 // 圆形图标按钮 + 包裹开销
+    } else {
+      // 文本按钮：按字数估算，保底 50px
+      width += Math.max(btn.label.length * 14 + 26, 50)
+    }
+  }
+  if (hasMore) width += 62 // "更多"下拉
+  width += 22 // el-table .cell 左右 padding
+
+  return Math.ceil(width) + 'px'
 })
 
 const resolvedActionButtons = computed<ActionButton[]>(() => {
@@ -269,8 +293,8 @@ function getDefaultActions(): ActionButton[] {
   if (props.formConfig?.updateApi) {
     btns.push({
       label: '编辑',
+      icon: Edit,
       type: 'text',
-      size: 'small',
       permission: props.formConfig.editPermission,
       onClick: (row) => handleEdit(row),
     })
@@ -278,8 +302,8 @@ function getDefaultActions(): ActionButton[] {
   if (props.formConfig?.deleteApi) {
     btns.push({
       label: '删除',
+      icon: Delete,
       type: 'text',
-      size: 'small',
       confirm: '确定删除该记录吗？',
       permission: props.formConfig.deletePermission,
       onClick: (row) => handleDelete(row),
@@ -341,7 +365,8 @@ function handleExport() {
 function handleCreate(initialValues?: Record<string, any>) {
   isEdit.value = false
   editId.value = 0
-  formData.value = initialValues ? { ...initialValues } : {}
+  const configInitialValues = props.formConfig?.initialValues || {}
+  formData.value = { ...configInitialValues, ...(initialValues || {}) }
   dialogTitle.value = props.formConfig?.dialogTitle?.create || '新增'
   dialogVisible.value = true
 }
