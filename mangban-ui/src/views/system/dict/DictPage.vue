@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { SearchTable } from '@/components/business'
 import type { SearchField, TableColumn, ActionButton, FormConfig } from '@/components/business/types'
 import { getDictTypeList, createDictType, updateDictType, deleteDictType, getDictDataList, createDictData, updateDictData, deleteDictData } from '@/api/dict'
@@ -71,23 +71,71 @@ const dataColumns: TableColumn[] = [
   { prop: 'createTime', label: '创建时间', width: 170 },
 ]
 
-const dataFormConfig: FormConfig<DictDataVO> = {
+const dataFormConfig = computed<FormConfig<DictDataVO>>(() => ({
+  initialValues: selectedType.value
+    ? {
+        dictTypeRow: selectedType.value,
+        dictCode: selectedType.value.dictCode,
+      }
+    : {},
   fields: [
+    {
+      type: 'lookup',
+      label: '字典分类',
+      prop: 'dictTypeRow',
+      rules: [{ required: true, message: '请选择字典分类', trigger: 'change' }],
+      props: {
+        fetchApi: async (params: any) => {
+          const res = await getDictTypeList({
+            page: params.page,
+            size: params.size,
+            dictName: params.keyword,
+          })
+          return { rows: res.data.rows, total: res.data.total }
+        },
+        columns: [
+          { prop: 'dictName', label: '字典名称', minWidth: 160 },
+          { prop: 'dictCode', label: '字典编码', width: 150 },
+          { prop: 'remark', label: '备注', minWidth: 120 },
+        ],
+        returnFields: { dictCode: 'dictCode' },
+        displayField: 'dictName',
+        placeholder: '请选择字典分类',
+        searchPlaceholder: '输入字典名称搜索',
+        dialogTitle: '选择字典分类',
+      },
+    },
     { type: 'input', label: '标签', prop: 'label', rules: [{ required: true, message: '请输入标签', trigger: 'blur' }] },
     { type: 'input', label: '值', prop: 'value', rules: [{ required: true, message: '请输入值', trigger: 'blur' }] },
     { type: 'input', label: '排序', prop: 'sortOrder' } as any,
   ],
-  createApi: async (data: any) => createDictData({ ...data, dictCode: selectedType.value?.dictCode }) as any,
-  updateApi: (id, data) => updateDictData(id as number, data) as any,
+  createApi: async (data: any) => {
+    const { dictTypeRow: _row, ...rest } = data
+    return createDictData(rest) as any
+  },
+  updateApi: (id, data) => {
+    const { dictTypeRow: _row, ...rest } = data
+    return updateDictData(id as number, rest) as any
+  },
   deleteApi: deleteDictData as any,
   getApi: async (id: any) => {
     if (!selectedType.value) return {} as any
     const res = await getDictDataList(selectedType.value.dictCode)
     const list = res.data as any[]
-    return list.find((d: any) => d.id === id) ?? ({} as any)
+    const item = list.find((d: any) => d.id === id)
+    if (!item) return {} as any
+    // 组装 lookup 回显行：根据 dictCode 找到对应字典类型
+    let dictTypeRow: DictTypeVO | null = null
+    try {
+      const typeRes = await getDictTypeList({ page: 1, size: 999 })
+      dictTypeRow = typeRes.data.rows.find((t: DictTypeVO) => t.dictCode === item.dictCode) || null
+    } catch {
+      dictTypeRow = null
+    }
+    return { ...item, dictTypeRow }
   },
   dialogTitle: { create: '新增字典项', edit: '编辑字典项' },
-}
+}))
 
 const dataActionButtons: ActionButton[] = [
   {

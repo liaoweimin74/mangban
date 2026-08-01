@@ -56,6 +56,12 @@ public class DictDataServiceImpl implements DictDataService {
     public DictDataVO update(Long id, DictDataUpdateRequest request) {
         SysDictData dd = dictDataRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("字典数据不存在"));
+        if (StringUtils.hasText(request.dictCode())) {
+            if (dictTypeRepository.findByDictCode(request.dictCode()).isEmpty()) {
+                throw new BusinessException("字典类型不存在");
+            }
+            dd.setDictCode(request.dictCode());
+        }
         if (StringUtils.hasText(request.label())) dd.setLabel(request.label());
         if (StringUtils.hasText(request.value())) dd.setValue(request.value());
         if (request.sortOrder() != null) dd.setSortOrder(request.sortOrder());

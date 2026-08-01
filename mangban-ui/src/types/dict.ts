@@ -44,6 +44,7 @@ export interface DictDataCreateForm {
 }
 
 export interface DictDataUpdateForm {
+  dictCode?: string
   label?: string
   value?: string
   sortOrder?: number
