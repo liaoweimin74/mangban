@@ -4,8 +4,8 @@ import com.mangban.common.domain.entity.BaseEntity;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "sys_isolation_point")
-public class SysIsolationPoint extends BaseEntity {
+@Table(name = "isolation_point")
+public class IsolationPoint extends BaseEntity {
     @Column(name = "unit_id", nullable = false)
     private Long unitId;
 

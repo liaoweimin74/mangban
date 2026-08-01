@@ -4,9 +4,9 @@ import com.mangban.common.constant.GlobalConstant;
 import com.mangban.common.exception.BusinessException;
 import com.mangban.blindplate.domain.dto.LocationCreateRequest;
 import com.mangban.blindplate.domain.dto.LocationUpdateRequest;
-import com.mangban.blindplate.domain.entity.SysLocation;
+import com.mangban.blindplate.domain.entity.Location;
 import com.mangban.blindplate.domain.vo.LocationTreeNode;
-import com.mangban.blindplate.repository.SysLocationRepository;
+import com.mangban.blindplate.repository.LocationRepository;
 import com.mangban.blindplate.service.LocationService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,23 +17,23 @@ import java.util.stream.Collectors;
 
 @Service
 public class LocationServiceImpl implements LocationService {
-    private final SysLocationRepository locationRepository;
+    private final LocationRepository locationRepository;
 
-    public LocationServiceImpl(SysLocationRepository locationRepository) {
+    public LocationServiceImpl(LocationRepository locationRepository) {
         this.locationRepository = locationRepository;
     }
 
     @Override
     public List<LocationTreeNode> tree() {
-        List<SysLocation> roots = locationRepository.findByParentIdIsNullOrderBySortOrder();
+        List<Location> roots = locationRepository.findByParentIdIsNullOrderBySortOrder();
         return roots.stream()
                 .filter(l -> l.getIsDeleted() == 0)
                 .map(this::toTreeNode)
                 .collect(Collectors.toList());
     }
 
-    private LocationTreeNode toTreeNode(SysLocation location) {
-        List<SysLocation> children = locationRepository.findByParentIdOrderBySortOrder(location.getId());
+    private LocationTreeNode toTreeNode(Location location) {
+        List<Location> children = locationRepository.findByParentIdOrderBySortOrder(location.getId());
         List<LocationTreeNode> childNodes = children.stream()
                 .filter(c -> c.getIsDeleted() == 0)
                 .map(this::toTreeNode)
@@ -52,7 +52,7 @@ public class LocationServiceImpl implements LocationService {
             }
             return;
         }
-        SysLocation parent = locationRepository.findById(parentId)
+        Location parent = locationRepository.findById(parentId)
                 .orElseThrow(() -> new BusinessException("父节点不存在"));
         if ("FACTORY".equals(childType)) {
             throw new BusinessException("工厂节点必须为根节点");
@@ -69,7 +69,7 @@ public class LocationServiceImpl implements LocationService {
     @Transactional
     public LocationTreeNode create(LocationCreateRequest request) {
         validateParentType(request.type(), request.parentId());
-        SysLocation location = new SysLocation();
+        Location location = new Location();
         location.setParentId(request.parentId());
         location.setName(request.name());
         location.setCode(request.code());
@@ -83,7 +83,7 @@ public class LocationServiceImpl implements LocationService {
     @Override
     @Transactional
     public LocationTreeNode update(Long id, LocationUpdateRequest request) {
-        SysLocation location = locationRepository.findById(id)
+        Location location = locationRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("位置节点不存在"));
         if (StringUtils.hasText(request.name())) location.setName(request.name());
         if (StringUtils.hasText(request.code())) location.setCode(request.code());
@@ -102,7 +102,7 @@ public class LocationServiceImpl implements LocationService {
         if (locationRepository.countByParentIdAndIsDeleted(id, 0) > 0) {
             throw new BusinessException("存在子节点，无法删除");
         }
-        SysLocation location = locationRepository.findById(id).orElseThrow();
+        Location location = locationRepository.findById(id).orElseThrow();
         location.setIsDeleted(GlobalConstant.DELETED_YES);
         locationRepository.save(location);
     }

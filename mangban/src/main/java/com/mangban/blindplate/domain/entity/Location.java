@@ -6,8 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "sys_location")
-public class SysLocation extends BaseEntity {
+@Table(name = "location")
+public class Location extends BaseEntity {
     @Column(name = "parent_id")
     private Long parentId;
 
@@ -29,7 +29,7 @@ public class SysLocation extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id", insertable = false, updatable = false)
     @OrderBy("sortOrder ASC")
-    private List<SysLocation> children = new ArrayList<>();
+    private List<Location> children = new ArrayList<>();
 
     public Long getParentId() { return parentId; }
     public void setParentId(Long parentId) { this.parentId = parentId; }
@@ -43,6 +43,6 @@ public class SysLocation extends BaseEntity {
     public void setSortOrder(Integer sortOrder) { this.sortOrder = sortOrder; }
     public String getRemark() { return remark; }
     public void setRemark(String remark) { this.remark = remark; }
-    public List<SysLocation> getChildren() { return children; }
-    public void setChildren(List<SysLocation> children) { this.children = children; }
+    public List<Location> getChildren() { return children; }
+    public void setChildren(List<Location> children) { this.children = children; }
 }

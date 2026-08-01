@@ -4,11 +4,11 @@ import com.mangban.common.constant.GlobalConstant;
 import com.mangban.common.domain.PageResult;
 import com.mangban.common.exception.BusinessException;
 import com.mangban.blindplate.domain.dto.*;
-import com.mangban.blindplate.domain.entity.SysIsolationPoint;
-import com.mangban.blindplate.domain.entity.SysLocation;
+import com.mangban.blindplate.domain.entity.IsolationPoint;
+import com.mangban.blindplate.domain.entity.Location;
 import com.mangban.blindplate.domain.vo.IsolationPointVO;
-import com.mangban.blindplate.repository.SysIsolationPointRepository;
-import com.mangban.blindplate.repository.SysLocationRepository;
+import com.mangban.blindplate.repository.IsolationPointRepository;
+import com.mangban.blindplate.repository.LocationRepository;
 import com.mangban.blindplate.service.IsolationPointService;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
@@ -25,11 +25,11 @@ import java.util.Optional;
 
 @Service
 public class IsolationPointServiceImpl implements IsolationPointService {
-    private final SysIsolationPointRepository isolationPointRepository;
-    private final SysLocationRepository locationRepository;
+    private final IsolationPointRepository isolationPointRepository;
+    private final LocationRepository locationRepository;
 
-    public IsolationPointServiceImpl(SysIsolationPointRepository isolationPointRepository,
-                                     SysLocationRepository locationRepository) {
+    public IsolationPointServiceImpl(IsolationPointRepository isolationPointRepository,
+                                     LocationRepository locationRepository) {
         this.isolationPointRepository = isolationPointRepository;
         this.locationRepository = locationRepository;
     }
@@ -38,12 +38,12 @@ public class IsolationPointServiceImpl implements IsolationPointService {
     public PageResult<IsolationPointVO> list(Long unitId, Long plantId, String code, String name,
                                               String medium, String hazardLevel, String status,
                                               String occupyStatus, int page, int size) {
-        Specification<SysIsolationPoint> spec = (root, query, cb) -> {
+        Specification<IsolationPoint> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
             predicates.add(cb.equal(root.get("isDeleted"), 0));
             if (unitId != null) predicates.add(cb.equal(root.get("unitId"), unitId));
             if (plantId != null) {
-                List<Long> unitIds = findUnitsByPlant(plantId).stream().map(SysLocation::getId).toList();
+                List<Long> unitIds = findUnitsByPlant(plantId).stream().map(Location::getId).toList();
                 if (!unitIds.isEmpty()) {
                     predicates.add(root.get("unitId").in(unitIds));
                 }
@@ -56,16 +56,16 @@ public class IsolationPointServiceImpl implements IsolationPointService {
             if (StringUtils.hasText(occupyStatus)) predicates.add(cb.equal(root.get("occupyStatus"), occupyStatus));
             return cb.and(predicates.toArray(new Predicate[0]));
         };
-        Page<SysIsolationPoint> p = isolationPointRepository.findAll(spec,
+        Page<IsolationPoint> p = isolationPointRepository.findAll(spec,
                 PageRequest.of(page - 1, size, Sort.by(Sort.Direction.ASC, "id")));
         return new PageResult<>(p.getTotalElements(), page, size,
                 p.getContent().stream().map(this::toVO).toList());
     }
 
-    private List<SysLocation> findUnitsByPlant(Long plantId) {
-        List<SysLocation> units = new ArrayList<>();
-        List<SysLocation> children = locationRepository.findByParentIdOrderBySortOrder(plantId);
-        for (SysLocation child : children) {
+    private List<Location> findUnitsByPlant(Long plantId) {
+        List<Location> units = new ArrayList<>();
+        List<Location> children = locationRepository.findByParentIdOrderBySortOrder(plantId);
+        for (Location child : children) {
             if ("UNIT".equals(child.getType()) && child.getIsDeleted() == 0) {
                 units.add(child);
             }
@@ -73,19 +73,19 @@ public class IsolationPointServiceImpl implements IsolationPointService {
         return units;
     }
 
-    private IsolationPointVO toVO(SysIsolationPoint ip) {
+    private IsolationPointVO toVO(IsolationPoint ip) {
         String unitName = null, plantName = null, factoryName = null;
-        Optional<SysLocation> unitOpt = locationRepository.findById(ip.getUnitId());
+        Optional<Location> unitOpt = locationRepository.findById(ip.getUnitId());
         if (unitOpt.isPresent()) {
-            SysLocation unit = unitOpt.get();
+            Location unit = unitOpt.get();
             unitName = unit.getName();
             if (unit.getParentId() != null) {
-                Optional<SysLocation> plantOpt = locationRepository.findById(unit.getParentId());
+                Optional<Location> plantOpt = locationRepository.findById(unit.getParentId());
                 if (plantOpt.isPresent()) {
-                    SysLocation plant = plantOpt.get();
+                    Location plant = plantOpt.get();
                     plantName = plant.getName();
                     if (plant.getParentId() != null) {
-                        Optional<SysLocation> factoryOpt = locationRepository.findById(plant.getParentId());
+                        Optional<Location> factoryOpt = locationRepository.findById(plant.getParentId());
                         if (factoryOpt.isPresent()) {
                             factoryName = factoryOpt.get().getName();
                         }
@@ -103,7 +103,7 @@ public class IsolationPointServiceImpl implements IsolationPointService {
 
     @Override
     public IsolationPointVO getById(Long id) {
-        SysIsolationPoint ip = isolationPointRepository.findById(id)
+        IsolationPoint ip = isolationPointRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("隔离点不存在"));
         return toVO(ip);
     }
@@ -111,7 +111,7 @@ public class IsolationPointServiceImpl implements IsolationPointService {
     @Override
     @Transactional
     public IsolationPointVO create(IsolationPointCreateRequest request) {
-        SysLocation unit = locationRepository.findById(request.unitId())
+        Location unit = locationRepository.findById(request.unitId())
                 .orElseThrow(() -> new BusinessException("所属单元不存在"));
         if (!"UNIT".equals(unit.getType())) {
             throw new BusinessException("隔离点必须挂在单元下");
@@ -119,7 +119,7 @@ public class IsolationPointServiceImpl implements IsolationPointService {
         if (isolationPointRepository.findByCode(request.code()).isPresent()) {
             throw new BusinessException("编码已存在");
         }
-        SysIsolationPoint ip = new SysIsolationPoint();
+        IsolationPoint ip = new IsolationPoint();
         ip.setUnitId(request.unitId());
         ip.setCode(request.code());
         ip.setName(request.name());
@@ -139,10 +139,10 @@ public class IsolationPointServiceImpl implements IsolationPointService {
     @Override
     @Transactional
     public IsolationPointVO update(Long id, IsolationPointUpdateRequest request) {
-        SysIsolationPoint ip = isolationPointRepository.findById(id)
+        IsolationPoint ip = isolationPointRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("隔离点不存在"));
         if (request.unitId() != null) {
-            SysLocation unit = locationRepository.findById(request.unitId())
+            Location unit = locationRepository.findById(request.unitId())
                     .orElseThrow(() -> new BusinessException("所属单元不存在"));
             if (!"UNIT".equals(unit.getType())) {
                 throw new BusinessException("隔离点必须挂在单元下");
@@ -174,7 +174,7 @@ public class IsolationPointServiceImpl implements IsolationPointService {
     @Override
     @Transactional
     public void delete(Long id) {
-        SysIsolationPoint ip = isolationPointRepository.findById(id)
+        IsolationPoint ip = isolationPointRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("隔离点不存在"));
         ip.setIsDeleted(GlobalConstant.DELETED_YES);
         isolationPointRepository.save(ip);
@@ -186,7 +186,7 @@ public class IsolationPointServiceImpl implements IsolationPointService {
         if (!List.of("OPEN", "BLIND").contains(request.status())) {
             throw new BusinessException("无效状态值，仅支持 OPEN 或 BLIND");
         }
-        SysIsolationPoint ip = isolationPointRepository.findById(id)
+        IsolationPoint ip = isolationPointRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("隔离点不存在"));
         ip.setStatus(request.status());
         ip = isolationPointRepository.save(ip);
@@ -199,7 +199,7 @@ public class IsolationPointServiceImpl implements IsolationPointService {
         if (!List.of("OCCUPIED", "FREE").contains(request.occupyStatus())) {
             throw new BusinessException("无效占用状态值，仅支持 OCCUPIED 或 FREE");
         }
-        SysIsolationPoint ip = isolationPointRepository.findById(id)
+        IsolationPoint ip = isolationPointRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("隔离点不存在"));
         ip.setOccupyStatus(request.occupyStatus());
         ip = isolationPointRepository.save(ip);
