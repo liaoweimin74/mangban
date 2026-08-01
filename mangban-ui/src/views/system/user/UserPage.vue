@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { Key } from '@element-plus/icons-vue'
 import { SearchTable } from '@/components/business'
 import type { SearchField, TableColumn, ActionButton, FormConfig } from '@/components/business/types'
 import { getUserList, createUser, updateUser, deleteUser, updateUserStatus, resetUserPassword, getUserById } from '@/api/user'
@@ -95,6 +96,7 @@ const searchTableRef = ref()
 const actionButtons: ActionButton[] = [
   {
     label: '重置密码',
+    icon: Key,
     size: 'small',
     type: 'warning',
     confirm: '确定重置密码吗？',

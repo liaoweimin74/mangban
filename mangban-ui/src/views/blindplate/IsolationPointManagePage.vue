@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { Switch, Lock } from '@element-plus/icons-vue'
 import { SearchTable } from '@/components/business'
 import type { SearchField, TableColumn, ActionButton } from '@/components/business/types'
 import { getLocationTree, createLocation, updateLocation, deleteLocation } from '@/api/location'
@@ -43,7 +44,7 @@ const locationActionButtons: ActionButton[] = [
 
 function findNode(tree: LocationTreeNode[], id: number): LocationTreeNode | null {
   for (const node of tree) {
-    if (node.id === id) return node
+    if (Number(node.id) === Number(id)) return node
     if (node.children) {
       const found = findNode(node.children, id)
       if (found) return found
@@ -134,7 +135,14 @@ async function pointFetchApi(params: any) {
 const pointFormConfig: any = computed(() => ({
   layout: { cols: 2 },
   dialogWidth: '700px',
+  initialValues: { unitId: selectedUnitId.value },
   fields: [
+    {
+      type: 'tree-select', label: '所属位置', prop: 'unitId',
+      placeholder: '选择所属位置',
+      treeProps: { data: locationList.value, props: { label: 'name', value: 'id', children: 'children' } },
+      rules: [{ required: true, message: '请选择所属位置', trigger: 'change' }],
+    },
     { type: 'input', label: '编号', prop: 'code', rules: [{ required: true, message: '请输入编号', trigger: 'blur' }] },
     { type: 'input', label: '名称', prop: 'name', rules: [{ required: true, message: '请输入名称', trigger: 'blur' }] },
     { type: 'input', label: '介质', prop: 'medium' },
@@ -147,7 +155,7 @@ const pointFormConfig: any = computed(() => ({
     { type: 'input', label: '管线号', prop: 'pipelineNo' },
     { type: 'textarea', label: '备注', prop: 'remark' },
   ],
-  createApi: async (data: any) => createIsolationPoint({ ...data, unitId: selectedUnitId.value }),
+  createApi: async (data: any) => createIsolationPoint(data),
   updateApi: (id: number | string, data: any) => updateIsolationPoint(Number(id), data),
   deleteApi: (id: number | string) => deleteIsolationPoint(Number(id)),
   getApi: (id: number | string) => getIsolationPointById(Number(id)).then(r => r.data),
@@ -156,7 +164,7 @@ const pointFormConfig: any = computed(() => ({
 
 const pointActionButtons: ActionButton[] = [
   {
-    label: '通盲切换', size: 'small', type: 'text',
+    label: '通盲切换', icon: Switch, size: 'small', type: 'text',
     onClick: async (row: any) => {
       const newStatus = row.status === 'OPEN' ? 'BLIND' : 'OPEN'
       await updateIsolationPointStatus(row.id, { status: newStatus })
@@ -164,7 +172,7 @@ const pointActionButtons: ActionButton[] = [
     },
   },
   {
-    label: '占用/释放', size: 'small', type: 'text',
+    label: '占用/释放', icon: Lock, size: 'small', type: 'text',
     onClick: async (row: any) => {
       const newOccupy = row.occupyStatus === 'FREE' ? 'OCCUPIED' : 'FREE'
       await updateIsolationPointOccupy(row.id, { occupyStatus: newOccupy })

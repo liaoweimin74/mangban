@@ -93,19 +93,28 @@ onMounted(async () => {
     :form-config="formConfig"
   />
 
-  <el-dialog v-model="menuDialogVisible" title="分配菜单权限" width="420px">
-    <el-tree
-      ref="menuTreeRef"
-      :data="menuTree"
-      show-checkbox
-      node-key="id"
-      :default-checked-keys="checkedMenuKeys"
-      :props="{ label: 'menuName', children: 'children' }"
-      default-expand-all
-    />
+  <el-dialog v-model="menuDialogVisible" title="分配菜单权限" width="420px" :close-on-click-modal="false">
+    <div class="menu-tree-container">
+      <el-tree
+        ref="menuTreeRef"
+        :data="menuTree"
+        show-checkbox
+        node-key="id"
+        :default-checked-keys="checkedMenuKeys"
+        :props="{ label: 'menuName', children: 'children' }"
+        default-expand-all
+      />
+    </div>
     <template #footer>
       <el-button @click="menuDialogVisible = false">取消</el-button>
       <el-button type="primary" @click="handleMenuSubmit">保存</el-button>
     </template>
   </el-dialog>
 </template>
+
+<style scoped>
+.menu-tree-container {
+  height: 360px;
+  overflow-y: auto;
+}
+</style>

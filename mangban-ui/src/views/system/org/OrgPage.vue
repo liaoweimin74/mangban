@@ -55,16 +55,18 @@ const formConfig = computed<FormConfig<TreeNode>>(() => ({
   createApi: (data: any) => createOrg({ ...data, orgName: data.name, orgCode: data.code }),
   updateApi: (id, data: any) => updateOrg(id as number, { ...data, orgName: data.name, orgCode: data.code }),
   deleteApi: deleteOrg,
-  getApi: async (id) => {
+  getApi: async (id: number | string) => {
     const res = await getOrgTree()
-    return findNode(res.data, id)
+    const node = findNode(res.data, Number(id))
+    if (!node) return null
+    return { ...node, name: node.label }
   },
   dialogTitle: { create: '新增组织', edit: '编辑组织' },
 }))
 
 function findNode(tree: TreeNode[], id: number): TreeNode | null {
   for (const node of tree) {
-    if (node.id === id) return node
+    if (Number(node.id) === Number(id)) return node
     if (node.children) {
       const found = findNode(node.children, id)
       if (found) return found
